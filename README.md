@@ -11,6 +11,27 @@
 	<li><a href="http://box2d-js.sourceforge.net/">Box2DJS</a> integrated for easily apply physics on a node.</li>
 </ul>
 
+<h2><a href="http://stormcolour.appspot.com/CONTENT/Canvas2DJS-1.0-API-Doc/Canvas2DJS.html">API DOC</a></h2>
+
+<h2>Quick Guide</h2>
+`
+c2d.createScene({	target: document.getElementById('animGround'),
+					pxByMeter: 25});
+c2d.setGravity({x: 0.0, y: 98.0});
+
+
+						
+var box = c2d.createNode();
+var box_sprite1 = c2d.createSprite({url: 'box.png',
+									cols: 1,
+									rows: 1,
+									onload: function(){
+										box.spriteSet(box_sprite1);
+									}});
+box.position($V2([100,100]));
+`
+
+
 
 
 
