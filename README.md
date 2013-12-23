@@ -48,16 +48,16 @@
 <h2>Box2DJS physics</h2>
 <p>Allow direct access to Canvas API for the composing of a single node:</p>
 ```
-	var box = c2d.createNode();
-	box.$(function(ctx) {
-				ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
-				ctx.fillRect(-50, -50, 100, 100);
-			});
-	box.position($V2([100,100]));
+var box = c2d.createNode();
+box.$(function(ctx) {
+			ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+			ctx.fillRect(-50, -50, 100, 100);
+		});
+box.position($V2([100,100]));
 ```
 
 <h2>Box2DJS physics</h2>
-<p>Canvas2DJS integrates Box2DJS for easy activation of physical:</p>
+<p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
 ```
 c2d.createScene({target: document.getElementById('animGround')});
 c2d.setGravity({x: 0.0, y: 98.0});
