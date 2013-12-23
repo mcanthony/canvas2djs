@@ -26,21 +26,24 @@ In the head tag:
 ```
 In the body tag we create the scene with a single node with a sprite:
 ```
-c2d.createScene({target: document.getElementById('animGround')});
+<canvas id="animGround" width="800" height="600"></canvas>
+<script>
+	c2d.createScene({target: document.getElementById('animGround')});
 
-var box = c2d.createNode();
-var box_sprite1 = c2d.createSprite({url: 'box.png',
-									cols: 1,
-									rows: 1,
-									onload: function(){
-										box.spriteSet(box_sprite1);
-									}});
-box.position($V2([100,100]));
+	var box = c2d.createNode();
+	var box_sprite1 = c2d.createSprite({url: 'box.png',
+										cols: 1,
+										rows: 1,
+										onload: function(){
+											box.spriteSet(box_sprite1);
+										}});
+	box.position($V2([100,100]));
 
 
-c2d.start(function(){
-	c2d.allShow(500);
-});
+	c2d.start(function(){
+		c2d.allShow(500);
+	});
+</script>
 ```
 
 
