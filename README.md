@@ -1,6 +1,6 @@
 <h1>canvas2djs</h1>
 
-<p>Basic scene graph for games and applications over the HTML canvas </p>
+<p>Scene graph for games and applications over the HTML canvas </p>
 
 <h2>Canvas2DJS features:</h2>
 <ul>
