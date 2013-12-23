@@ -45,8 +45,9 @@
 	});
 </script>
 ```
-<h2>Box2DJS physics</h2>
-<p>Allow direct access to Canvas API for the composing of a single node:</p>
+
+<h2>Composing the node:</h2>
+<p>Allow also direct access to Canvas API for the composing of a single node:</p>
 ```
 var box = c2d.createNode();
 box.$(function(ctx) {
@@ -55,7 +56,15 @@ box.$(function(ctx) {
 		});
 box.position($V2([100,100]));
 ```
-
+<p>And if you want change the actual composing:</p>
+```
+box.$clear(); // 
+box.$(function(ctx) { //  composition
+	ctx.fillStyle = "rgba(0, 128, 255, 0.5)";
+	ctx.fillRect(-50, -50, 100, 100);
+});
+```
+		
 <h2>Box2DJS physics</h2>
 <p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
 ```
@@ -79,6 +88,13 @@ box.bodyOnCollision(function(node) {
 		   });
 ```
 
+<h2>Animations</h2>
+<p>You can also animate objects using basic transformations:</p>
+```
+box.animPosition({	position: $V2([150,100]),
+					velocity: 0.1,
+					onend: function() {}	});
+```
 
 
 
