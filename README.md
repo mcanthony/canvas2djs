@@ -12,6 +12,7 @@
 </ul>
 
 <h2><a href="http://stormcolour.appspot.com/CONTENT/Canvas2DJS-1.0-API-Doc/Canvas2DJS.html">API DOC</a></h2>
+<h2><a href="http://stormcolour.appspot.com/canvas2djs">WEBSITE</a></h2>
 
 <h2>Quick Guide</h2>
 <p>In the head tag:</p>
