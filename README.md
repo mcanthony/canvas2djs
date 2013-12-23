@@ -14,7 +14,7 @@
 <h2><a href="http://stormcolour.appspot.com/CONTENT/Canvas2DJS-1.0-API-Doc/Canvas2DJS.html">API DOC</a></h2>
 
 <h2>Quick Guide</h2>
-In the head tag:
+<p>In the head tag:</p>
 ```
 <script type="text/javascript" src="Canvas2DJS/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="Canvas2DJS/jquery-ui-1.10.2.custom.min.js"></script>
@@ -24,7 +24,7 @@ In the head tag:
 <script type="text/javascript" src="Canvas2DJS/Canvas2DNode.class.js"></script>
 <script type="text/javascript" src="Canvas2DJS/Canvas2DJS.class.js"></script>
 ```
-In the body tag we create the scene with a single node with a sprite:
+<p>In the body tag we create the scene with a single node with a sprite:</p>
 ```
 <canvas id="animGround" width="800" height="600"></canvas>
 <script>
@@ -45,7 +45,39 @@ In the body tag we create the scene with a single node with a sprite:
 	});
 </script>
 ```
+<h2>Box2DJS physics</h2>
+<p>Allow direct access to Canvas API for the composing of a single node:</p>
+```
+	var box = c2d.createNode();
+	box.$(function(ctx) {
+				ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+				ctx.fillRect(-50, -50, 100, 100);
+			});
+	box.position($V2([100,100]));
+```
 
+<h2>Box2DJS physics</h2>
+<p>Canvas2DJS integrates Box2DJS for easy activation of physical:</p>
+```
+c2d.createScene({target: document.getElementById('animGround')});
+c2d.setGravity({x: 0.0, y: 98.0});
+
+var box = c2d.createNode();
+box.$(function(ctx) {
+				ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+				ctx.fillRect(-50, -50, 100, 100);
+			});
+box.bodyEnable({shape_type: 'square', // 'square'|'circle'
+				friction:0.5,
+				mass: 1,
+				density: 1.0,
+				width: 100,
+				height:100, 
+				mousepicking: true});  // for allow picking the node
+box.bodyOnCollision(function(node) { 
+			   box.hide(500);
+		   });
+```
 
 
 
