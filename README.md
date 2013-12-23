@@ -69,8 +69,8 @@ box.position($V2([100,100]));
 ```
 <p>And if you want change the actual composing:</p>
 ```
-box.$clear(); // 
-box.$(function(ctx) { //  composition
+box.$clear();
+box.$(function(ctx) {
 	ctx.fillStyle = "rgba(0, 128, 255, 0.3)";
 	ctx.fillRect(-50, -50, 100, 100);
 });
@@ -79,7 +79,8 @@ box.$(function(ctx) { //  composition
 <h2>Box2DJS physics</h2>
 <p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
 ```
-c2d.createScene({target: document.getElementById('animGround')});
+c2d.createScene({	target: document.getElementById('animGround'),
+					pxByMeter: 25});
 c2d.setGravity({x: 0.0, y: 98.0});
 
 var box = c2d.createNode();
