@@ -105,6 +105,9 @@ box.bodyOnCollision(function(node) {
 box.animPosition({	position: $V2([150,100]),
 					velocity: 0.1,
 					onend: function() {}	});
+					
+box.animRotation({	rotation: 3.1,
+					velocity: 0.1	});
 ```
 
 
