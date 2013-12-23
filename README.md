@@ -24,7 +24,7 @@
 <script type="text/javascript" src="Canvas2DJS/Canvas2DNode.class.js"></script>
 <script type="text/javascript" src="Canvas2DJS/Canvas2DJS.class.js"></script>
 ```
-<p>In the body tag we create the scene with a single node with a sprite:</p>
+<p>In the body tag we create the scene with a single node with a sprite that contain a single image:</p>
 ```
 <canvas id="animGround" width="800" height="600"></canvas>
 <script>
@@ -32,8 +32,6 @@
 
 	var box = c2d.createNode();
 	var box_sprite1 = c2d.createSprite({url: 'box.png',
-										cols: 1,
-										rows: 1,
 										onload: function(){
 											box.spriteSet(box_sprite1);
 										}});
@@ -45,22 +43,35 @@
 	});
 </script>
 ```
+<p>If the sprite contain more images:</p>
+```
+var box = c2d.createNode();
+var box_sprite1 = c2d.createSprite({url: 'sprite.png',
+									cols: 3,
+									rows: 2,
+									onload: function(){
+										box.spriteSet(box_sprite1);
+										box.spriteFrames({	arrayFrames: [0,1,4,5],
+															delay: 60,
+															onend: function(){}	});
+									}});
+```
 
 <h2>Composing the node:</h2>
 <p>Allow also direct access to Canvas API for the composing of a single node:</p>
 ```
 var box = c2d.createNode();
 box.$(function(ctx) {
-			ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
-			ctx.fillRect(-50, -50, 100, 100);
-		});
+	ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+	ctx.fillRect(-50, -50, 100, 100);
+});
 box.position($V2([100,100]));
 ```
 <p>And if you want change the actual composing:</p>
 ```
 box.$clear(); // 
 box.$(function(ctx) { //  composition
-	ctx.fillStyle = "rgba(0, 128, 255, 0.5)";
+	ctx.fillStyle = "rgba(0, 128, 255, 0.3)";
 	ctx.fillRect(-50, -50, 100, 100);
 });
 ```
