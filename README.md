@@ -1,9 +1,9 @@
-canvas2djs
+<h1>canvas2djs</h1>
 ==========
 
-<h1>Basic scene graph for games and applications over the HTML canvas </h1>
+<p>Basic scene graph for games and applications over the HTML canvas </p>
 
-<p>Canvas2DJS provides the following features:</p>
+<h2>Canvas2DJS features:</h2>
 <ul>
 	<li>• Basic Scene Graph.</li>
 	<li>• Basic sprite system if your node is of type image.</li>
