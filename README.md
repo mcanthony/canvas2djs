@@ -16,7 +16,7 @@
 
 <h2>Quick Guide</h2>
 <p>In the head tag:</p>
-```
+```html
 <script type="text/javascript" src="Canvas2DJS/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="Canvas2DJS/jquery-ui-1.10.2.custom.min.js"></script>
 <script type="text/javascript" src="Canvas2DJS/Box2dWeb-2.1.a.3.js"></script>
@@ -26,7 +26,7 @@
 <script type="text/javascript" src="Canvas2DJS/Canvas2DJS.class.js"></script>
 ```
 <p>In the body tag we create the scene with a single node with a sprite that contain a single image:</p>
-```
+```html
 <canvas id="animGround" width="800" height="600"></canvas>
 <script>
 	c2d.createScene({target: document.getElementById('animGround')});
@@ -45,7 +45,7 @@
 </script>
 ```
 <p>If the sprite contain more images:</p>
-```
+```javascript
 var box = c2d.createNode();
 var box_sprite1 = c2d.createSprite({url: 'sprite.png',
 									cols: 3,
