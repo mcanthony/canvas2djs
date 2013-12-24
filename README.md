@@ -60,7 +60,7 @@ var box_sprite1 = c2d.createSprite({url: 'sprite.png',
 
 <h2>Composing the node:</h2>
 <p>Allow also direct access to Canvas API for the composing of a single node:</p>
-```
+```javascript
 var box = c2d.createNode();
 box.$(function(ctx) {
 	ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
@@ -69,7 +69,7 @@ box.$(function(ctx) {
 box.position($V2([100,100]));
 ```
 <p>And if you want change the actual composing:</p>
-```
+```javascript
 box.$clear();
 box.$(function(ctx) {
 	ctx.fillStyle = "rgba(0, 128, 255, 0.3)";
@@ -79,7 +79,7 @@ box.$(function(ctx) {
 		
 <h2>Box2DJS physics</h2>
 <p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
-```
+```javascript
 c2d.createScene({	target: document.getElementById('animGround'),
 					pxByMeter: 25});
 c2d.setGravity({x: 0.0, y: 98.0});
@@ -103,7 +103,7 @@ box.bodyOnCollision(function(node) {
 
 <h2>Animations</h2>
 <p>You can also animate objects using basic transformations:</p>
-```
+```javascript
 box.animPosition({	position: $V2([150,100]),
 					velocity: 0.1,
 					onend: function() {}	});
