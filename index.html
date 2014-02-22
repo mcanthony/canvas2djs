@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ES">
+	<head>
+		<title>Canvas2DJS</title>
+		<meta name='description' content='Canvas2DJS'/>
+		<meta charset="utf-8">
+		
+		<style>
+			* {
+				outline: none;
+			}
+			body{
+				background:#FFF;
+				color: #000;
+				font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+				margin:0px;
+				font-size:12px;
+				overflow:hidden;
+				-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -o-user-select: none; user-select: none;
+			}
+		</style>
+		
+		<script type="text/javascript" src="Canvas2DJS/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="Canvas2DJS/jquery-ui-1.10.2.custom.min.js"></script>
+		<script type="text/javascript" src="Canvas2DJS/Box2dWeb-2.1.a.3.js"></script>
+		<script type="text/javascript" src="Canvas2DJS/Canvas2DUtils.class.js"></script> 
+		<script type="text/javascript" src="Canvas2DJS/Canvas2DSprite.class.js"></script>
+		<script type="text/javascript" src="Canvas2DJS/Canvas2DNode.class.js"></script>
+		<script type="text/javascript" src="Canvas2DJS/Canvas2DJS.class.js"></script>
+	</head>
+
+	<body>
+		
+		<canvas id="animGround" width="800" height="600"></canvas>
+	
+		<script>		
+			c2d.createScene({target: document.getElementById('animGround'),
+							pxByMeter: 25});
+			c2d.setGravity({x: 0.0, y: 98.0});
+
+			
+									
+			var box = c2d.createNode();
+			box.show();
+			
+			/*var box_sprite1 = c2d.createSprite({	url: 'box.png',
+													cols: 1,
+													rows: 1,
+													onload: function(){
+														box.spriteSet(box_sprite1);
+														box.spriteFrames({arrayFrames: [0]});
+													}});*/	
+			box.$(function(ctx) {
+				// CanvasRenderingContext2D API functions
+				ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+				ctx.fillRect(-50, -50, 100, 100);
+			});
+			
+			box.position($V2([100,100]));
+			box.animRotation({	rotation: 3.1,
+								velocity: 0.1	});
+			box.animPosition({	position: $V2([150,100]),
+								velocity: 0.1,
+								onend: function() {
+									box.$clear();
+									box.$(function(ctx) {
+										ctx.fillStyle = "rgba(0, 128, 255, 0.5)";
+										ctx.fillRect(-50, -50, 100, 100);
+									});
+								}});
+			box.bodyEnable({	shape_type: 'square',
+								friction:0.5,
+								mass: 1,
+								density: 1.0,
+								width: 100,
+								height:100, 
+								mousepicking: true});  
+			box.bodyOnCollision(function(node) { 
+                           box.hide(500);
+                       });
+					   
+					   
+					   
+					   
+					   
+					   
+			var ground = c2d.createNode();
+			ground.show();
+			
+			var ground_sprite1 = c2d.createSprite({	url: 'box.png',
+													cols: 1,
+													rows: 1,
+													onload: function(){
+														ground.spriteSet(ground_sprite1);
+													}});	
+			/*ground.$(function(ctx) {
+				ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+				ctx.fillRect(-50, -50, 100, 100);
+			});*/
+			ground.position($V2([100,500]));
+			ground.bodyEnable({	shape_type: 'square',
+								friction:0.5,
+								mass: 0,
+								density: 1.0,
+								width: 100,
+								height:100});  
+										
+										
+									
+			
+			// START 
+			c2d.start(function(){
+				c2d.allShow(500);
+			});
+		</script>
+		
+		
+		
+    </body>
+</html>
