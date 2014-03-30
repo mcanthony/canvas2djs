@@ -8,7 +8,16 @@ window.requestAnimFrame = (function(){
 				window.setTimeout(callback, 1000 / 60);
 			};
 })();
-window.cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+window.cancelAnimationFrame = function(){
+	return 	window.cancelAnimationFrame ||
+			window.webkitCancelAnimationFrame ||
+			window.mozCancelAnimationFrame ||
+			window.oCancelAnimationFrame ||
+			window.msCancelAnimationFrame     || 
+			function(callback){
+				clearTimeout(callback);
+			};
+}();
 
 // http://box2d-js.sourceforge.net/
 var b2Vec2 = Box2D.Common.Math.b2Vec2,
