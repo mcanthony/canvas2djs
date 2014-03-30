@@ -33,7 +33,7 @@ Canvas2DJS = function() {
 	this.canvas;
 	this.width;
 	this.height;
-	this.scale = 1.0; 
+	this.screenAdjust = false; 
 	this.divPositionX = 0;
 	this.divPositionY = 0;
 	this.mousePosX, this.mousePosY, this.oldMousePosClickX, this.oldMousePosClickX;
@@ -49,7 +49,7 @@ Canvas2DJS = function() {
 * Set the canvas element
 * @param	{Object} jsonIn
 * 	@param {HTMLCanvasElement} jsonIn.target The canvas element
-* 	@param {Float} [jsonIn.scale=1.0] Scale of target
+* 	@param {Float} [jsonIn.screenAdjust=false] Adjust the canvas to the screen maintaining the aspect ratio
 * 	@param {Float} [jsonIn.pxByMeter=6.0] Scale of dynamic world
 */
 Canvas2DJS.prototype.createScene = function(jsonIn) {
@@ -57,7 +57,31 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.canvas = this.target.getContext("2d");
 	this.width = $('#'+this.target.id).width();
 	this.height = $('#'+this.target.id).height();
-	if(jsonIn.scale != undefined) this.scale = jsonIn.scale; 
+	
+	// SCREEN ADJUST
+	if(jsonIn.screenAdjust != undefined) this.screenAdjust = jsonIn.screenAdjust;
+	if(this.screenAdjust) {
+		function gcd (width, height) { // greatest common divisor (GCD) 
+			return (height == 0) ? width : gcd(height, width%height);
+		}
+		
+		var widthScreen = screen.width;
+		var heightScreen = screen.height;
+		
+		var r = gcd(this.width, this.height);
+		var aspectW = (this.width/r);
+		var aspectH = (this.height/r);
+		
+		if(aspectW > aspectH) {
+			this.target.style.width = widthScreen+'px';
+			this.target.style.height = ((widthScreen/aspectW)*aspectH)+'px';
+		} else {
+			this.target.style.height = heightScreen+'px';
+			this.target.style.width = ((heightScreen/aspectH)*aspectW)+'px';
+		}
+	}
+	
+	// BOX2DJS
 	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	
 	
 	
