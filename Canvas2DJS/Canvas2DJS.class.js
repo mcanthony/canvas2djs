@@ -40,7 +40,7 @@ Canvas2DJS = function() {
 	
 	this.worldScale;
 	this.world = undefined;
-	this.worldGravity = $V2([0.0, 9.8]);
+	this.worldGravity = new V2([0.0, 9.8]);
 	this.Pstep = 0;
 	this._BODYSeleccionado = undefined;
 	this.mousePVec, this.isMouseDown = false, this.selectedBody, this.mouseJoint;

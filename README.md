@@ -9,6 +9,7 @@
 	<li>If not is image then you can use the direct CanvasRenderingContext2D API for set fixed drawing for a single node.</li>
 	<li>Basic animations for the nodes</li>
 	<li><a href="http://box2d-js.sourceforge.net/">Box2DJS</a> integrated for easily apply physics on a node.</li>
+	<li>Works fine in browser and Apache Cordova</li>
 </ul>
 
 <h2><a href="http://stormcolour.appspot.com/CONTENT/Canvas2DJS-1.0-API-Doc/Canvas2DJS.html">API DOC</a></h2>
@@ -17,13 +18,7 @@
 <h2>Quick Guide</h2>
 <p>In the head tag:</p>
 ```html
-<script type="text/javascript" src="Canvas2DJS/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="Canvas2DJS/jquery-ui-1.10.2.custom.min.js"></script>
-<script type="text/javascript" src="Canvas2DJS/Box2dWeb-2.1.a.3.js"></script>
-<script type="text/javascript" src="Canvas2DJS/Canvas2DUtils.class.js"></script> 
-<script type="text/javascript" src="Canvas2DJS/Canvas2DSprite.class.js"></script>
-<script type="text/javascript" src="Canvas2DJS/Canvas2DNode.class.js"></script>
-<script type="text/javascript" src="Canvas2DJS/Canvas2DJS.class.js"></script>
+<script type="text/javascript" src="Canvas2DJS/Canvas2DJS.js"></script>
 ```
 <p>In the body tag we create the scene with a single node with a sprite that contain a single image:</p>
 ```html
