@@ -24,7 +24,8 @@
 ```html
 <canvas id="animGround" width="800" height="600"></canvas>
 <script>
-	c2d.createScene({target: document.getElementById('animGround')});
+	c2d.createScene({target: document.getElementById('animGround'),
+					screenAdjust: false});
 
 	var box = c2d.createNode();
 	var box_sprite1 = c2d.createSprite({url: 'box.png',
@@ -76,6 +77,7 @@ box.$(function(ctx) {
 <p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
 ```javascript
 c2d.createScene({	target: document.getElementById('animGround'),
+					screenAdjust: false,
 					pxByMeter: 25});
 c2d.setGravity({x: 0.0, y: 98.0});
 
@@ -106,7 +108,9 @@ box.animPosition({	position: $V2([150,100]),
 box.animRotation({	rotation: 3.1,
 					velocity: 0.1	});
 ```
-
+<br />
+<p><a href="http://stormcolour.appspot.com/CONTENT/temp/c2d/example1/index.html" style="font-size:22px">? RUN DEMO ?</a></p>
+<br />
 
 
 
