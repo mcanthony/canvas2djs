@@ -83,6 +83,9 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 		this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
 		this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
 		this.updateDivPosition();
+	} else {
+		this.styleWidthScale = 1.0;
+		this.styleHeightScale = 1.0;
 	}
 	
 	// BOX2DJS
