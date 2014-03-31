@@ -79,10 +79,14 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 			this.target.style.height = heightScreen+'px';
 			this.target.style.width = ((heightScreen/aspectH)*aspectW)+'px';
 		}
+		
+		this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
+		this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
+		this.updateDivPosition();
 	}
 	
 	// BOX2DJS
-	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	
+	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	 
 	
 	
 	var str = 	'<table id="DIVID_SHApreloader" style="z-index:99;position:absolute;width:'+this.width+'px;height:'+this.height+'px;background-color:#FF0000">'+
@@ -185,8 +189,8 @@ Canvas2DJS.prototype.mousemove = function(e) {
 		e.button = 0;
 	} 
 	
-	c2d.mousePosX = (e.clientX - c2d.divPositionX)*c2d.worldScale; 
-	c2d.mousePosY = (e.clientY - c2d.divPositionY)*c2d.worldScale;
+	c2d.mousePosX = (e.clientX - c2d.divPositionX)*(c2d.worldScale); 
+	c2d.mousePosY = (e.clientY - c2d.divPositionY)*(c2d.worldScale);
 };
 /** @private */
 Canvas2DJS.prototype.getBodyCB = function(fixture) {
@@ -257,16 +261,16 @@ Canvas2DJS.prototype.next = function() {
 				if(c2d.nodes[n].playStackRunning == false) {
 					var pos = c2d.nodes[n].body.GetPosition();
 					if(c2d.nodes[n].lockXaxis == false) {
-						var x = pos.x/c2d.worldScale;
+						var x = pos.x/(c2d.worldScale*c2d.styleWidthScale);
 					} else {
 						var x = c2d.nodes[n].currentPosition.e[0];
-						c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*c2d.worldScale, pos.y));
+						c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), pos.y));
 					}
 					if(c2d.nodes[n].lockYaxis == false) {
-						var y = pos.y/c2d.worldScale;
+						var y = pos.y/(c2d.worldScale*c2d.styleHeightScale);
 					} else {
 						var y = c2d.nodes[n].currentPosition.e[1];
-						c2d.nodes[n].body.SetPosition(new b2Vec2(pos.x, c2d.nodes[n].currentPosition.e[1]*c2d.worldScale));
+						c2d.nodes[n].body.SetPosition(new b2Vec2(pos.x, c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 					}
 					c2d.nodes[n].currentPosition = $V2([x, y]);
 					
@@ -276,7 +280,7 @@ Canvas2DJS.prototype.next = function() {
 					
 					c2d.nodes[n].updateM9();
 				} else {
-					c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*c2d.worldScale, c2d.nodes[n].currentPosition.e[1]*c2d.worldScale));
+					c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 					c2d.nodes[n].bodyClearForces();
 				}
 				

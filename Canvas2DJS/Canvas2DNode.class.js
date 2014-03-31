@@ -395,7 +395,7 @@ Canvas2DNode.prototype.position = function(position) {
 		
 		this.updateM9();
 		
-		if(this.body != undefined) this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*c2d.worldScale, this.setedPosition.e[1]*c2d.worldScale));
+		if(this.body != undefined) this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 	} else {
 		return $V2([this.currentPosition.e[0], this.currentPosition.e[1]]);
 	}
@@ -503,11 +503,11 @@ Canvas2DNode.prototype.bodyEnable = function(jsonIn) {
 	
 	var shapeType = (jsonIn != undefined && jsonIn.shape_type == 'circle') ? 'circle' : 'square';
 	if(shapeType == 'circle') {
-		var shapeRadius = (jsonIn != undefined && jsonIn.radius != undefined) ? jsonIn.radius*c2d.worldScale : 25.0*c2d.worldScale;
+		var shapeRadius = (jsonIn != undefined && jsonIn.radius != undefined) ? jsonIn.radius*(c2d.worldScale*c2d.styleWidthScale) : 25.0*(c2d.worldScale*c2d.styleWidthScale);
 		this.fixDef.shape = new b2CircleShape(shapeRadius);
 	} else {
-		var shapeWidth = (jsonIn != undefined && jsonIn.width != undefined) ? (jsonIn.width/2.0)*c2d.worldScale : (25.0/2.0)*c2d.worldScale;
-		var shapeHeight = (jsonIn != undefined && jsonIn.height != undefined) ? (jsonIn.height/2.0)*c2d.worldScale : (25.0/2.0)*c2d.worldScale;
+		var shapeWidth = (jsonIn != undefined && jsonIn.width != undefined) ? (jsonIn.width/2.0)*(c2d.worldScale*c2d.styleWidthScale) : (25.0/2.0)*(c2d.worldScale*c2d.styleWidthScale);
+		var shapeHeight = (jsonIn != undefined && jsonIn.height != undefined) ? (jsonIn.height/2.0)*(c2d.worldScale*c2d.styleWidthScale) : (25.0/2.0)*(c2d.worldScale*c2d.styleWidthScale);
 		this.fixDef.shape = new b2PolygonShape;
 		this.fixDef.shape.SetAsBox(shapeWidth, shapeHeight);
 	}
@@ -516,7 +516,7 @@ Canvas2DNode.prototype.bodyEnable = function(jsonIn) {
 	//this.bodyDef.type = b2Body.b2_staticBody;
 	//this.bodyDef.type = b2Body.b2_kynematicBody;
 	this.bodyDef.type = (jsonIn.mass == 0) ? b2Body.b2_staticBody : b2Body.b2_dynamicBody; 
-	this.bodyDef.position.Set(this.currentPosition.e[0]*c2d.worldScale, this.currentPosition.e[1]*c2d.worldScale);
+	this.bodyDef.position.Set(this.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale));
 	
 	this.body = c2d.world.CreateBody(this.bodyDef);
 	this.body.canvas2DNode = this;
@@ -564,7 +564,7 @@ Canvas2DNode.prototype.bodyActive = function(active) {
 		if(this.tmpBody != undefined) {
 			this.body = this.tmpBody;
 			this.tmpBody = undefined; 
-			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*c2d.worldScale, this.setedPosition.e[1]*c2d.worldScale));
+			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 			this.body.SetAngle(this.setedRotation);
 			this.body.SetActive(true);
 			this.body.SetAwake(true);
