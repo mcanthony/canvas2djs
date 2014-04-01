@@ -122,13 +122,13 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	window.addEventListener("orientationchange", c2d.updateDivPosition, false); 
 
 	window.addEventListener('touchStart', function(e) {
-												_this.divPosition = _this.getElementPosition(_this.target);
+												c2d.divPosition = c2d.getElementPosition(c2d.target);
 												e.preventDefault();
 												//var touch = e.touches[0];
 												//alert(touch.pageX + " - " + touch.pageY);
 											}, false);
 	window.addEventListener('touchmove', function(e) {
-												_this.divPosition = _this.getElementPosition(_this.target);
+												c2d.divPosition = c2d.getElementPosition(c2d.target);
 												e.preventDefault();
 											}, false);
 											
