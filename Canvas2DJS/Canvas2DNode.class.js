@@ -661,7 +661,7 @@ Canvas2DNode.prototype.bodyOnEndCollision = function(funct) {
 */
 Canvas2DNode.prototype.bodySetDistanceJoint = function(jsonIn) { 
 	var dj = new b2DistanceJointDef();
-	dj.Initialize(this.body, jsonIn.node.body, new b2Vec2(this.currentPosition.e[0]*c2d.worldScale,this.currentPosition.e[1]*c2d.worldScale), new b2Vec2(jsonIn.node.currentPosition.e[0]*c2d.worldScale,jsonIn.node.currentPosition.e[1]*c2d.worldScale));
+	dj.Initialize(this.body, jsonIn.node.body, new b2Vec2(this.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),this.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)), new b2Vec2(jsonIn.node.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),jsonIn.node.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 	dj.collideConnected = true;
 	this.distanceJoint = c2d.world.CreateJoint(dj);
 };
