@@ -62,50 +62,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.styleWidthScale = 1.0;
 	this.styleHeightScale = 1.0;
 	this.screen90rot = false;
-	
-	
-	if(jsonIn.screenAdjust != undefined) this.screenAdjust = jsonIn.screenAdjust;
-	if(this.screenAdjust) {
-		function gcd (width, height) { // greatest common divisor (GCD) 
-			return (height == 0) ? width : gcd(height, width%height);
-		}
-		
-		var widthScreen = document.documentElement.clientWidth;
-		var heightScreen = document.documentElement.clientHeight;
-		
-		var r = gcd(this.width, this.height);
-		var aspectW = (this.width/r); // 800/r = 4
-		var aspectH = (this.height/r); // 600/r = 3
-		
-		// rotate canvaselement if has a better fit to the screen
-		if(aspectW > aspectH && widthScreen < heightScreen) {
-			this.screen90rot = true;
-			var cW = this.width;
-			this.target.setAttribute('width', this.height);    
-			this.target.setAttribute('height', cW);  
-			this.width = this.target.getAttribute('width');
-			this.height = this.target.getAttribute('height');
-			
-			r = gcd(this.width, this.height);
-			aspectW = (this.width/r); // 800/r = 4
-			aspectH = (this.height/r); // 600/r = 3 
-		}
-		
-		// scale style
-		var newCanvasWidth = ((heightScreen/aspectH)*aspectW);
-		var newCanvasHeight = ((widthScreen/aspectW)*aspectH);
-		if(newCanvasHeight <= heightScreen) {
-			this.target.style.width = widthScreen+'px';
-			this.target.style.height = newCanvasHeight+'px';
-		} else {
-			this.target.style.width = newCanvasWidth+'px';
-			this.target.style.height = heightScreen+'px';
-		}
-
-		this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
-		this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
-		this.updateDivPosition();
-	}
+	this.screenAdjust = (jsonIn.screenAdjust != undefined) ? this.makeScreenAdjust() : false;
 	
 	// BOX2DJS
 	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	 
@@ -138,10 +95,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 							
 	$(document).ready(c2d.updateDivPosition);
 	window.addEventListener("resize", c2d.updateDivPosition, false);
-	window.addEventListener("orientationchange", function(e) {
-													e.preventDefault();
-													//c2d.updateDivPosition();
-												}, false); 
+	window.addEventListener("orientationchange", c2d.updateDivPosition, false); 
 	window.addEventListener('touchStart', function(e) {
 												c2d.divPosition = c2d.getElementPosition(c2d.target);
 												e.preventDefault();
@@ -159,7 +113,94 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.target.addEventListener("touchstart", c2d.mousedown, false);
 	document.body.addEventListener("mousemove", c2d.mousemove, false); 
 	document.body.addEventListener("touchmove", c2d.mousemove, false); 
+	
+	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0}
+	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA
+		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent, console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
+	} else if(window.DeviceOrientationEvent) { // DEVICEORIENTATION FOR DOM
+		window.addEventListener("MozOrientation", this.handleOrientationEvent, true);
+		window.addEventListener("deviceorientation", this.handleOrientationEvent, true);
+	} 	
 };
+/** @private */
+Canvas2DJS.prototype.makeScreenAdjust = function() {
+	this.screenAdjust = true;
+	
+	function gcd (width, height) { // greatest common divisor (GCD) 
+		return (height == 0) ? width : gcd(height, width%height);
+	}
+	
+	var widthScreen = document.documentElement.clientWidth;
+	var heightScreen = document.documentElement.clientHeight;
+	
+	var r = gcd(this.width, this.height);
+	var aspectW = (this.width/r); // 800/r = 4
+	var aspectH = (this.height/r); // 600/r = 3
+	
+	// rotate canvaselement if has a better fit to the screen
+	if(aspectW > aspectH && widthScreen < heightScreen) {
+		this.screen90rot = true;
+		var cW = this.width;
+		this.target.setAttribute('width', this.height);    
+		this.target.setAttribute('height', cW);  
+		this.width = this.target.getAttribute('width');
+		this.height = this.target.getAttribute('height');
+		
+		r = gcd(this.width, this.height);
+		aspectW = (this.width/r); // 800/r = 4
+		aspectH = (this.height/r); // 600/r = 3 
+	}
+	
+	// scale style
+	var newCanvasWidth = ((heightScreen/aspectH)*aspectW);
+	var newCanvasHeight = ((widthScreen/aspectW)*aspectH);
+	if(newCanvasHeight <= heightScreen) {
+		this.target.style.width = widthScreen+'px';
+		this.target.style.height = newCanvasHeight+'px';
+	} else {
+		this.target.style.width = newCanvasWidth+'px';
+		this.target.style.height = heightScreen+'px';
+	}
+
+	this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
+	this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
+	this.updateDivPosition();
+};
+/** @private */
+Canvas2DJS.prototype.handleOrientationEvent = function(event) {
+	var gamma = event.x || event.gamma;// gamma is the left-to-right tilt in degrees, where right is positive
+	var beta = event.y || event.beta;// beta is the front-to-back tilt in degrees, where front is positive
+	var alpha = event.z || event.alpha;// alpha is the compass direction the device is facing in degrees
+	c2d.orientation.gamma = (gamma/100)*-1.0;
+	c2d.orientation.beta = (beta/100)*-1.0;
+	c2d.orientation.alpha = (alpha/100)*-1.0;
+	
+	/*console.log('tiltLR GAMMA X: '+c2d.orientation.gamma+'<br />'+
+				'tiltFB BETA Y: '+c2d.orientation.beta+'<br />'+
+				'dir ALPHA Z: '+c2d.orientation.alpha+'<br />');*/
+};
+/**
+* Get the orientation tiltLeftRight (GAMMA X)
+* @returns {Float} Float dir.
+*/
+Canvas2DJS.prototype.getOrientationGamma = function() {
+	return (!this.screen90rot) ? this.orientation.gamma : this.orientation.beta;
+};
+/**
+* Get the orientation tiltFrontBack (BETA Y)
+* @returns {Float} Float dir.
+*/
+Canvas2DJS.prototype.getOrientationBeta = function() {
+	return (!this.screen90rot) ? this.orientation.beta : this.orientation.gamma*-1.0;
+};
+/**
+* Get the orientation dir (ALPHA Z)
+* @returns {Float} Float dir.
+*/
+Canvas2DJS.prototype.getOrientationAlpha = function() {
+	return this.orientation.alpha;
+};
+
 /** @private */
 Canvas2DJS.prototype.updateDivPosition = function() {
 	c2d.divPositionX = c2d.getElementPosition(c2d.target).x;
@@ -383,6 +424,7 @@ Canvas2DJS.prototype.start = function(onready) {
 					}, 100);
 	}
 };
+		
 /**
 * Create one node
 * @returns {Canvas2DNode} Canvas2DNode object.
