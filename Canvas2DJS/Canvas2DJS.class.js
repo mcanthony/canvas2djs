@@ -181,14 +181,14 @@ Canvas2DJS.prototype.handleOrientationEvent = function(event) {
 };
 /**
 * Get the orientation tiltLeftRight (GAMMA X)
-* @returns {Float} Float dir.
+* @returns {Float} Float tiltLR.
 */
 Canvas2DJS.prototype.getOrientationGamma = function() {
 	return (!this.screen90rot) ? this.orientation.gamma : this.orientation.beta;
 };
 /**
 * Get the orientation tiltFrontBack (BETA Y)
-* @returns {Float} Float dir.
+* @returns {Float} Float tiltFB.
 */
 Canvas2DJS.prototype.getOrientationBeta = function() {
 	return (!this.screen90rot) ? this.orientation.beta : this.orientation.gamma*-1.0;
