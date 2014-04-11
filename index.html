@@ -5,6 +5,10 @@
 		<meta name='description' content='Canvas2DJS'/>
 		<meta charset="utf-8">
 		
+		<meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+		
 		<style>
 			* {
 				outline: none;
@@ -25,13 +29,17 @@
 
 	<body>
 		
-		<canvas id="animGround" width="800" height="600" style="border:1px solid #FF0000"></canvas> 
-	
+		<div style="display:table;width:100%">
+		<div style="display:table-cell;text-align:center;">
+			<canvas id="animGround" width="800" height="600" style="border:2px solid #FF0000"></canvas> 
+		</div>
+		</div>
+		
 		<script>		
 			c2d.createScene({target: document.getElementById('animGround'),
 							pxByMeter: 25,
-							screenAdjust: false});
-			c2d.setGravity({x: 0.0, y: 98.0});
+							screenAdjust: true});
+			c2d.setGravity({x: 0.0, y: 0.0}); // 98.0
 
 			
 									

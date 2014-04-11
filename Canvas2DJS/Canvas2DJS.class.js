@@ -59,33 +59,52 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.height = $('#'+this.target.id).height();
 	
 	// SCREEN ADJUST
+	this.styleWidthScale = 1.0;
+	this.styleHeightScale = 1.0;
+	this.screen90rot = false;
+	
+	
 	if(jsonIn.screenAdjust != undefined) this.screenAdjust = jsonIn.screenAdjust;
 	if(this.screenAdjust) {
 		function gcd (width, height) { // greatest common divisor (GCD) 
 			return (height == 0) ? width : gcd(height, width%height);
 		}
 		
-		var widthScreen = screen.width;
-		var heightScreen = screen.height;
+		var widthScreen = document.documentElement.clientWidth;
+		var heightScreen = document.documentElement.clientHeight;
 		
 		var r = gcd(this.width, this.height);
-		var aspectW = (this.width/r);
-		var aspectH = (this.height/r);
+		var aspectW = (this.width/r); // 800/r = 4
+		var aspectH = (this.height/r); // 600/r = 3
 		
-		if(aspectW > aspectH) {
-			this.target.style.width = widthScreen+'px';
-			this.target.style.height = ((widthScreen/aspectW)*aspectH)+'px';
-		} else {
-			this.target.style.height = heightScreen+'px';
-			this.target.style.width = ((heightScreen/aspectH)*aspectW)+'px';
+		// rotate canvaselement if has a better fit to the screen
+		if(aspectW > aspectH && widthScreen < heightScreen) {
+			this.screen90rot = true;
+			var cW = this.width;
+			this.target.setAttribute('width', this.height);    
+			this.target.setAttribute('height', cW);  
+			this.width = this.target.getAttribute('width');
+			this.height = this.target.getAttribute('height');
+			
+			r = gcd(this.width, this.height);
+			aspectW = (this.width/r); // 800/r = 4
+			aspectH = (this.height/r); // 600/r = 3 
 		}
 		
+		// scale style
+		var newCanvasWidth = ((heightScreen/aspectH)*aspectW);
+		var newCanvasHeight = ((widthScreen/aspectW)*aspectH);
+		if(newCanvasHeight <= heightScreen) {
+			this.target.style.width = widthScreen+'px';
+			this.target.style.height = newCanvasHeight+'px';
+		} else {
+			this.target.style.width = newCanvasWidth+'px';
+			this.target.style.height = heightScreen+'px';
+		}
+
 		this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
 		this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
 		this.updateDivPosition();
-	} else {
-		this.styleWidthScale = 1.0;
-		this.styleHeightScale = 1.0;
 	}
 	
 	// BOX2DJS
@@ -119,8 +138,10 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 							
 	$(document).ready(c2d.updateDivPosition);
 	window.addEventListener("resize", c2d.updateDivPosition, false);
-	window.addEventListener("orientationchange", c2d.updateDivPosition, false); 
-
+	window.addEventListener("orientationchange", function(e) {
+													e.preventDefault();
+													//c2d.updateDivPosition();
+												}, false); 
 	window.addEventListener('touchStart', function(e) {
 												c2d.divPosition = c2d.getElementPosition(c2d.target);
 												e.preventDefault();
@@ -192,8 +213,14 @@ Canvas2DJS.prototype.mousemove = function(e) {
 		e.button = 0;
 	} 
 	
-	c2d.mousePosX = (e.clientX - c2d.divPositionX)*(c2d.worldScale); 
-	c2d.mousePosY = (e.clientY - c2d.divPositionY)*(c2d.worldScale);
+	if(!c2d.screen90rot) {
+		c2d.mousePosX = (e.clientX - c2d.divPositionX)*(c2d.worldScale); 
+		c2d.mousePosY = (e.clientY - c2d.divPositionY)*(c2d.worldScale);
+	} else {
+		c2d.mousePosX = ((e.clientY) - c2d.divPositionX)*(c2d.worldScale); 
+		c2d.mousePosY = ((e.target.clientWidth-e.clientX) - c2d.divPositionY)*(c2d.worldScale);
+	}
+	//console.log(c2d.mousePosX+'	'+c2d.mousePosY);
 };
 /** @private */
 Canvas2DJS.prototype.getBodyCB = function(fixture) {
@@ -301,12 +328,17 @@ Canvas2DJS.prototype.next = function() {
 	for(var n = 0; n < c2d.nodes.length; n++) {
 		c2d.canvas.save();
 		c2d.canvas.globalAlpha = c2d.nodes[n].opacity;
+		/*if(c2d.screen90rot) {
+			c2d.canvas.translate(240, 0);
+			c2d.canvas.rotate(90*Math.PI/180);
+		}*/ 
 		//c2d.canvas.translate(c2d.nodes[n].currentPosition.e[0], c2d.nodes[n].currentPosition.e[1]);
 		//c2d.canvas.rotate(c2d.nodes[n].currentRotation);
 		//c2d.canvas.scale(c2d.nodes[n].currentScale.e[0], c2d.nodes[n].currentScale.e[1]);
 				  
 		var m = c2d.nodes[n].M9;
-		c2d.canvas.setTransform(m[0], m[3], m[1], m[4], m[2], m[5]);
+		if(!c2d.screen90rot) c2d.canvas.setTransform(m[0], m[3], m[1], m[4], m[2], m[5]);
+		else c2d.canvas.setTransform(m[0], m[3], m[1], m[4], c2d.width-m[5], m[2]);
 		
 		for(var s = 0; s < c2d.nodes[n].stack$.length; s++) {
 			c2d.nodes[n].stack$[s](c2d.canvas);
