@@ -12,6 +12,7 @@ Canvas2DNode = function() {
 	
 	// STACK INSTRUCTIONS
 	this.stack$ = [];
+	this.values$ = [];
 	
 	// SPRITE FRAMES
 	this.sprite = undefined;
@@ -68,15 +69,18 @@ Canvas2DNode.prototype.addChildNode = function(jsonIn) {
 /**
 * Add canvas instructions to the stack of fixed canvas instructions of this node.
 * @param {Function} instructions Canvas instructions
+* @param {Array} values Canvas context values
 */
-Canvas2DNode.prototype.$ = function(instructions) { 
+Canvas2DNode.prototype.$ = function(instructions, values) { 
 	this.stack$.push(instructions); 
+	this.values$.push(values); 
 };
 /**
 * Clear the fixed instructions stack
 */
 Canvas2DNode.prototype.$clear = function() { 
 	this.stack$ = []; 
+	this.values$ = []; 
 };
 /**
 * Hide the node

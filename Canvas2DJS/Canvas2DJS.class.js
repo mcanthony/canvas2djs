@@ -369,10 +369,7 @@ Canvas2DJS.prototype.next = function() {
 	for(var n = 0; n < c2d.nodes.length; n++) {
 		c2d.canvas.save();
 		c2d.canvas.globalAlpha = c2d.nodes[n].opacity;
-		/*if(c2d.screen90rot) {
-			c2d.canvas.translate(240, 0);
-			c2d.canvas.rotate(90*Math.PI/180);
-		}*/ 
+		
 		//c2d.canvas.translate(c2d.nodes[n].currentPosition.e[0], c2d.nodes[n].currentPosition.e[1]);
 		//c2d.canvas.rotate(c2d.nodes[n].currentRotation);
 		//c2d.canvas.scale(c2d.nodes[n].currentScale.e[0], c2d.nodes[n].currentScale.e[1]);
@@ -381,8 +378,9 @@ Canvas2DJS.prototype.next = function() {
 		if(!c2d.screen90rot) c2d.canvas.setTransform(m[0], m[3], m[1], m[4], m[2], m[5]);
 		else c2d.canvas.setTransform(m[0], m[3], m[1], m[4], c2d.width-m[5], m[2]);
 		
+		if(c2d.screen90rot) c2d.canvas.rotate(90*Math.PI/180);
 		for(var s = 0; s < c2d.nodes[n].stack$.length; s++) {
-			c2d.nodes[n].stack$[s](c2d.canvas);
+			c2d.nodes[n].stack$[s](c2d.canvas, c2d.nodes[n].values$[s]);
 		}
 		
 		if(c2d.nodes[n].sprite) {
