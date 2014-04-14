@@ -115,12 +115,16 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	document.body.addEventListener("touchmove", c2d.mousemove, false); 
 	
 	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0}
-	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA
+	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA XYZ
 		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent, console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
-	} else if(window.DeviceOrientationEvent) { // DEVICEORIENTATION FOR DOM
+	}
+	if(window.DeviceOrientationEvent) { // DEVICEORIENTATION FOR DOM gamma beta alpha
 		window.addEventListener("MozOrientation", this.handleOrientationEvent, true);
 		window.addEventListener("deviceorientation", this.handleOrientationEvent, true);
 	} 	
+	if(window.DeviceMotionEvent) { // DEVICEMOTION FOR DOM event.accelerationIncludingGravity.x event.accelerationIncludingGravity.y event.accelerationIncludingGravity.z
+		window.addEventListener("devicemotion", this.handleOrientationEvent, true);
+	}
 };
 /** @private */
 Canvas2DJS.prototype.makeScreenAdjust = function() {
@@ -168,9 +172,9 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 };
 /** @private */
 Canvas2DJS.prototype.handleOrientationEvent = function(event) {
-	var gamma = event.x || event.gamma;// gamma is the left-to-right tilt in degrees, where right is positive
-	var beta = event.y || event.beta;// beta is the front-to-back tilt in degrees, where front is positive
-	var alpha = event.z || event.alpha;// alpha is the compass direction the device is facing in degrees
+	var gamma = event.x || event.gamma || event.accelerationIncludingGravity.x*-100.0;// gamma is the left-to-right tilt in degrees, where right is positive
+	var beta = event.y || event.beta || event.accelerationIncludingGravity.y*100.0;// beta is the front-to-back tilt in degrees, where front is positive
+	var alpha = event.z || event.alpha || event.accelerationIncludingGravity.z*100.0;// alpha is the compass direction the device is facing in degrees
 	c2d.orientation.gamma = (gamma/100)*-1.0;
 	c2d.orientation.beta = (beta/100)*-1.0;
 	c2d.orientation.alpha = (alpha/100)*-1.0;
