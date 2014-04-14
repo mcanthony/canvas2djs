@@ -184,24 +184,24 @@ Canvas2DJS.prototype.handleOrientationEvent = function(event) {
 				'dir ALPHA Z: '+c2d.orientation.alpha+'<br />');*/
 };
 /**
-* Get the orientation tiltLeftRight (GAMMA X)
+* Get the device orientation tiltLeftRight (GAMMA X)
 * @returns {Float} Float tiltLR.
 */
-Canvas2DJS.prototype.getOrientationGamma = function() {
+Canvas2DJS.prototype.getDeviceGamma = function() {
 	return (!this.screen90rot) ? this.orientation.gamma : this.orientation.beta;
 };
 /**
-* Get the orientation tiltFrontBack (BETA Y)
+* Get the device orientation tiltFrontBack (BETA Y)
 * @returns {Float} Float tiltFB.
 */
-Canvas2DJS.prototype.getOrientationBeta = function() {
+Canvas2DJS.prototype.getDeviceBeta = function() {
 	return (!this.screen90rot) ? this.orientation.beta : this.orientation.gamma*-1.0;
 };
 /**
-* Get the orientation dir (ALPHA Z)
+* Get the device orientation dir (ALPHA Z)
 * @returns {Float} Float dir.
 */
-Canvas2DJS.prototype.getOrientationAlpha = function() {
+Canvas2DJS.prototype.getDeviceAlpha = function() {
 	return this.orientation.alpha;
 };
 
