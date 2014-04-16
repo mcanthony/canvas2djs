@@ -58,15 +58,17 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.width = $('#'+this.target.id).width();
 	this.height = $('#'+this.target.id).height();
 	
+	
+			
 	// SCREEN ADJUST
 	this.styleWidthScale = 1.0;
 	this.styleHeightScale = 1.0;
-	this.screen90rot = false;
-	this.screenAdjust = (jsonIn.screenAdjust != undefined) ? this.makeScreenAdjust() : false;
+	this.screenAdjust = (jsonIn.screenAdjust != undefined && jsonIn.screenAdjust) ? this.makeScreenAdjust() : false;
 	
 	// BOX2DJS
 	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	 
-	
+	this.camera = new Canvas2DNode();
+	this.camera.show();
 	
 	var str = 	'<table id="DIVID_SHApreloader" style="z-index:99;position:absolute;width:'+this.width+'px;height:'+this.height+'px;background-color:#FF0000">'+
 					'<tr>'+
@@ -142,7 +144,7 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 	var aspectH = (this.height/r); // 600/r = 3
 	
 	// rotate canvaselement if has a better fit to the screen
-	if(aspectW > aspectH && widthScreen < heightScreen) {
+	/*if(aspectW > aspectH && widthScreen < heightScreen) {
 		this.screen90rot = true;
 		var cW = this.width;
 		this.target.setAttribute('width', this.height);    
@@ -153,7 +155,7 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 		r = gcd(this.width, this.height);
 		aspectW = (this.width/r); // 800/r = 4
 		aspectH = (this.height/r); // 600/r = 3 
-	}
+	}*/
 	
 	// scale style
 	var newCanvasWidth = ((heightScreen/aspectH)*aspectW);
@@ -188,14 +190,14 @@ Canvas2DJS.prototype.handleOrientationEvent = function(event) {
 * @returns {Float} Float tiltLR.
 */
 Canvas2DJS.prototype.getDeviceGamma = function() {
-	return (!this.screen90rot) ? this.orientation.gamma : this.orientation.beta;
+	return this.orientation.gamma;
 };
 /**
 * Get the device orientation tiltFrontBack (BETA Y)
 * @returns {Float} Float tiltFB.
 */
 Canvas2DJS.prototype.getDeviceBeta = function() {
-	return (!this.screen90rot) ? this.orientation.beta : this.orientation.gamma*-1.0;
+	return this.orientation.beta;
 };
 /**
 * Get the device orientation dir (ALPHA Z)
@@ -258,13 +260,9 @@ Canvas2DJS.prototype.mousemove = function(e) {
 		e.button = 0;
 	} 
 	
-	if(!c2d.screen90rot) {
-		c2d.mousePosX = (e.clientX - c2d.divPositionX)*(c2d.worldScale); 
-		c2d.mousePosY = (e.clientY - c2d.divPositionY)*(c2d.worldScale);
-	} else {
-		c2d.mousePosX = ((e.clientY) - c2d.divPositionX)*(c2d.worldScale); 
-		c2d.mousePosY = ((e.target.clientWidth-e.clientX) - c2d.divPositionY)*(c2d.worldScale);
-	}
+	c2d.mousePosX = (e.clientX - c2d.divPositionX-(((c2d.width/2)-c2d.camera.M9[2]) *c2d.styleWidthScale)) *(c2d.worldScale);  
+	c2d.mousePosY = (e.clientY - c2d.divPositionY-(((c2d.height/2)-c2d.camera.M9[5]) *c2d.styleHeightScale)) *(c2d.worldScale);
+
 	//console.log(c2d.mousePosX+'	'+c2d.mousePosY);
 };
 /** @private */
@@ -370,19 +368,22 @@ Canvas2DJS.prototype.next = function() {
 	//c2d.canvas.setTransform(m11, m12, m21, m22, dx, dy);
 	//c2d.canvas.transform(1, 0, 0, 1, 0, 0);
 	c2d.canvas.clearRect(0, 0, c2d.width, c2d.height);
+	
 	for(var n = 0; n < c2d.nodes.length; n++) {
+	
 		c2d.canvas.save();
 		c2d.canvas.globalAlpha = c2d.nodes[n].opacity;
 		
-		//c2d.canvas.translate(c2d.nodes[n].currentPosition.e[0], c2d.nodes[n].currentPosition.e[1]);
-		//c2d.canvas.rotate(c2d.nodes[n].currentRotation);
-		//c2d.canvas.scale(c2d.nodes[n].currentScale.e[0], c2d.nodes[n].currentScale.e[1]);
-				  
-		var m = c2d.nodes[n].M9;
-		if(!c2d.screen90rot) c2d.canvas.setTransform(m[0], m[3], m[1], m[4], m[2], m[5]);
-		else c2d.canvas.setTransform(m[0], m[3], m[1], m[4], c2d.width-m[5], m[2]);
+		var m = c2d.camera.M9;
+		c2d.canvas.setTransform(m[0], m[3], m[1], m[4], (c2d.width/2)-m[2], (c2d.height/2)-m[5]);
 		
-		if(c2d.screen90rot) c2d.canvas.rotate(90*Math.PI/180);
+		var m = c2d.nodes[n].M9;
+		c2d.canvas.transform(m[0], m[3], m[1], m[4], m[2], m[5]); 
+		
+		//c2d.canvas.translate(c2d.camera.currentPosition.e[0], c2d.camera.currentPosition.e[1]);
+		//c2d.canvas.rotate(c2d.camera.currentRotation);
+		//c2d.canvas.scale(c2d.camera.currentScale.e[0], c2d.camera.currentScale.e[1]);
+		
 		for(var s = 0; s < c2d.nodes[n].stack$.length; s++) {
 			c2d.nodes[n].stack$[s](c2d.canvas, c2d.nodes[n].values$[s]);
 		}
@@ -396,8 +397,11 @@ Canvas2DJS.prototype.next = function() {
 									c2d.nodes[n].sprite.cellHeight);
 			
 		}
+		
 		c2d.canvas.globalAlpha = 1.0;
+		
 		c2d.canvas.restore();
+		
 	}
 	
 };
@@ -426,7 +430,14 @@ Canvas2DJS.prototype.start = function(onready) {
 					}, 100);
 	}
 };
-		
+
+/**
+* Get the camera node
+* @returns {Canvas2DNode} Canvas2DNode object.
+*/
+Canvas2DJS.prototype.getCamera = function() {
+	return this.camera;
+};
 /**
 * Create one node
 * @returns {Canvas2DNode} Canvas2DNode object.
