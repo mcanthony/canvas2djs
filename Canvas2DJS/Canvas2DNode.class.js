@@ -53,6 +53,7 @@ Canvas2DNode = function() {
 	this.bodyOnCollisionFunction = undefined;
 	this.bodyOnEndCollisionFunction = undefined;
 	this.mousepicking = false;
+	this.detector = false;
 	this.distanceJoint = undefined;
 	this.lockXaxis = false;
 	this.lockYaxis = false;
@@ -489,16 +490,18 @@ Canvas2DNode.prototype.getVectorY = function() {
 * 	@param {Float} [jsonIn.width=25.0] Width if shape_type is 'square'
 * 	@param {Float} [jsonIn.height=25.0] Height if shape_type is 'square'
 * 	@param {Float} [jsonIn.radius=25.0] Radius  if shape_type is 'circle'
-* 	@param {Float} [jsonIn.mass=1.0] The child node
-* 	@param {Float} [jsonIn.density=1.0] The child node
-* 	@param {Float} [jsonIn.friction=0.5] The child node
-* 	@param {Float} [jsonIn.restitution=0.2] The child node
-* 	@param {Bool} [jsonIn.mousepicking=false] The child node
+* 	@param {Float} [jsonIn.mass=1.0] ==0.0 static; >0.0 dynamic; 
+* 	@param {Float} [jsonIn.density=1.0] Density
+* 	@param {Float} [jsonIn.friction=0.5] Friction
+* 	@param {Float} [jsonIn.restitution=0.2] Restitution
+* 	@param {Bool} [jsonIn.mousepicking=false] Allow drag the node with the mouse
+* 	@param {Bool} [jsonIn.detector=false] Allow drag the node with the mouse
 */
 Canvas2DNode.prototype.bodyEnable = function(jsonIn) { 
 	if(c2d.world == undefined) c2d.startPhysic();
 	
-	this.mousepicking = (jsonIn != undefined && jsonIn.mousepicking == true) ? true : false;
+	this.mousepicking = jsonIn.mousepicking || false;
+	this.detector = jsonIn.detector || false;
 	
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = (jsonIn != undefined && jsonIn.density != undefined) ? jsonIn.density*c2d.worldScale : 1.0;
@@ -519,14 +522,20 @@ Canvas2DNode.prototype.bodyEnable = function(jsonIn) {
 	this.bodyDef = new b2BodyDef;
 	//this.bodyDef.type = b2Body.b2_staticBody;
 	//this.bodyDef.type = b2Body.b2_kynematicBody;
-	this.bodyDef.type = (jsonIn.mass == 0) ? b2Body.b2_staticBody : b2Body.b2_dynamicBody; 
+	 
+	if(this.detector)
+		this.bodyDef.type = b2Body.b2_kynematicBody;
+	else	
+		this.bodyDef.type = (jsonIn.mass == 0) ? b2Body.b2_staticBody : b2Body.b2_dynamicBody;
 	this.bodyDef.position.Set(this.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale));
 	
 	this.body = c2d.world.CreateBody(this.bodyDef);
 	this.body.canvas2DNode = this;
 	//this.body.SetLinearDamping(10.0); 
 	//this.body.SetLinearVelocity(new b2Vec2(1000,1000)); 
-	this.body.CreateFixture(this.fixDef);  
+	var ff = this.body.CreateFixture(this.fixDef);  
+	if(this.detector) 
+		ff.SetSensor(true); 
 	
 	var massData = new b2MassData();
 	this.body.GetMassData(massData);
@@ -565,8 +574,8 @@ Canvas2DNode.prototype.bodyActive = function(active) {
 			this.body = undefined;
 		}
 	} else {
-		if(this.tmpBody != undefined) {
-			this.body = this.tmpBody;
+		if(this.tmpBody != undefined || this.body != undefined) {
+			this.body = this.tmpBody || this.body;
 			this.tmpBody = undefined; 
 			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
 			this.body.SetAngle(this.setedRotation);
@@ -676,7 +685,32 @@ Canvas2DNode.prototype.bodyRemoveDistanceJoint = function() {
 	c2d.world.DestroyJoint(this.distanceJoint);
 	this.distanceJoint = undefined;
 };
+/**
+* set revolute joint
+* @param {Object} jsonIn
+* 	@param {Canvas2DNode} jsonIn.node node
+* 	@param {Float} [jsonIn.referenceAngle=0.0] referenceAngle Reference angle in radians
+* 	@param {Float} [jsonIn.lowerAngle=-0.5] lowerAngle Lower angle in radians
+* 	@param {Float} [jsonIn.upperAngle=1.0] upperAngle Upper angle in radians
+*/
+Canvas2DNode.prototype.bodySetRevoluteJoint = function(jsonIn) { 
+	this.rj = new  b2RevoluteJointDef();
+	this.rj.Initialize(this.body, jsonIn.node.body, this.body.GetWorldCenter());
+	 
+	this.rj.maxMotorTorque = 1.0; 
+	this.rj.motorSpeed = 0.0;
+	this.rj.enableMotor = true;
+	
+	this.rj.referenceAngle = jsonIn.referenceAngle || 0.0;
+	this.rj.lowerAngle = jsonIn.lowerAngle || -0.5;
+	this.rj.upperAngle = jsonIn.upperAngle || 1.0;
+	this.rj.enableLimit = true;
 
+	//rj.localAnchorA.Set(1,1);
+	//rj.localAnchorB.Set(0,0);
+  
+	c2d.world.CreateJoint(this.rj);
+};
 
 
 // ►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►

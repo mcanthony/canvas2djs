@@ -33,7 +33,8 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2,
 	b2ContactListener = Box2D.Dynamics.b2ContactListener,
 	//b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
 	b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef,
-	b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef;
+	b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef,
+	b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
 	
 /**
 * @class

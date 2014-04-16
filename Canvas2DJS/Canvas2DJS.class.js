@@ -354,6 +354,7 @@ Canvas2DJS.prototype.next = function() {
 					c2d.nodes[n].updateM9();
 				} else {
 					c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+					c2d.nodes[n].body.SetAngle(c2d.nodes[n].currentRotation);
 					c2d.nodes[n].bodyClearForces();
 				}
 				
