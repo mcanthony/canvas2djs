@@ -55,6 +55,7 @@ Canvas2DNode = function() {
 	this.mousepicking = false;
 	this.detector = false;
 	this.distanceJoint = undefined;
+	this.revoluteJoint = undefined;
 	this.lockXaxis = false;
 	this.lockYaxis = false;
 };
@@ -709,9 +710,15 @@ Canvas2DNode.prototype.bodySetRevoluteJoint = function(jsonIn) {
 	//rj.localAnchorA.Set(1,1);
 	//rj.localAnchorB.Set(0,0);
   
-	c2d.world.CreateJoint(this.rj);
+	this.revoluteJoint = c2d.world.CreateJoint(this.rj);
 };
-
+/**
+* Remove revolute joint
+*/
+Canvas2DNode.prototype.bodyRemoveRevoluteJoint = function() { 
+	c2d.world.DestroyJoint(this.revoluteJoint);
+	this.revoluteJoint = undefined;
+};
 
 // ►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►
 // SPRITES
