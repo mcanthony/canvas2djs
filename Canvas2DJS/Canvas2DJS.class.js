@@ -55,17 +55,16 @@ Canvas2DJS = function() {
 Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.target = jsonIn.target;
 	this.canvas = this.target.getContext("2d");
-	
-	var e = document.createElement('div');
-	e.id = "C2D_"+this.target.id;
-	this.target.parentNode.insertBefore(e,this.target);
-	this.target.parentNode.removeChild(this.target);
-	e.appendChild(this.target);  
-	this.$ = $('#'+this.target.id);
-		
 	this.width = $('#'+this.target.id).width();
 	this.height = $('#'+this.target.id).height();
 	
+	this.targetP = document.createElement('div');
+	this.targetP.id = "C2D_"+this.target.id;
+	this.target.parentNode.insertBefore(this.targetP,this.target);
+	this.target.parentNode.removeChild(this.target);
+	this.targetP.appendChild(this.target);  
+	this.$ = $('#'+this.targetP.id);
+	this.$.css('overflow','hidden');
 	
 			
 	// SCREEN ADJUST
@@ -99,10 +98,9 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 						'</td>'+
 					'</tr>'+
 				'</table>';
-	$('#'+this.target.id).append(str);
-	$('#'+this.target.id).css('overflow','hidden');
+	this.$.append(str);
+	
 	 
-							
 	$(document).ready(c2d.updateDivPosition);
 	window.addEventListener("resize", c2d.updateDivPosition, false);
 	window.addEventListener("orientationchange", c2d.updateDivPosition, false); 
@@ -478,6 +476,78 @@ Canvas2DJS.prototype.createSprite = function(jsonIn) {
 	this.sprites.push(sprite);
 	sprite.create(jsonIn);
 	return sprite;
+};
+/**
+* Create one helper box info
+*/
+Canvas2DJS.prototype.createHelperBoxInfo = function() {
+	var str = 	'<div id="DIVID_C2DEditNode">'+
+					'WIDTH<div id="DIVID_C2DEditNode_sliderWidth"></div>'+
+					'HEIGHT<div id="DIVID_C2DEditNode_sliderHeight"></div>'+
+					'X<div id="DIVID_C2DEditNode_sliderX"></div>'+
+					'Y<div id="DIVID_C2DEditNode_sliderY"></div>'+
+					'ROT<div id="DIVID_C2DEditNode_sliderRot"></div>'+
+					'<input type="text" id="DIVID_C2DEditNode_sliderLog" style="width:100%" />'+
+				'</div>';
+	this.$.append(str);
+	
+	
+	this.nodeBoxInfo = this.createNode();
+	this.nodeBoxInfo.show();
+	this.boxInfo = {width: 100, 	height: 5, 	x: 0, 	 y: 0,rot: 0.0};
+	this.drawBoxInfo();
+	
+	$("#DIVID_C2DEditNode_sliderWidth").slider({max:150.0,
+											min:1,
+											value:c2d.boxInfo.width,
+											step:1,
+											slide:function(event,ui){
+													 c2d.boxInfo.width = ui.value;
+													 c2d.drawBoxInfo();
+												}});
+	$("#DIVID_C2DEditNode_sliderHeight").slider({max:150.0,
+											min:1,
+											value:c2d.boxInfo.height,
+											step:1,
+											slide:function(event,ui){
+													 c2d.boxInfo.height = ui.value;
+													 c2d.drawBoxInfo();
+												}});
+	$("#DIVID_C2DEditNode_sliderX").slider({max:c2d.width,
+											min:0,
+											value:c2d.boxInfo.x,
+											step:1,
+											slide:function(event,ui){
+													 c2d.boxInfo.x = ui.value;
+													 c2d.drawBoxInfo();
+												}});
+	$("#DIVID_C2DEditNode_sliderY").slider({max:c2d.height,
+											min:0,
+											value:c2d.boxInfo.y,
+											step:1,
+											slide:function(event,ui){
+													 c2d.boxInfo.y = ui.value;
+													 c2d.drawBoxInfo();
+												}});
+	$("#DIVID_C2DEditNode_sliderRot").slider({max:3.14*2,
+											min:0.0,
+											value:c2d.boxInfo.rot,
+											step:0.1,
+											slide:function(event,ui){
+													 c2d.boxInfo.rot = ui.value;
+													 c2d.drawBoxInfo();
+												}});
+};
+/** @private */
+Canvas2DJS.prototype.drawBoxInfo = function() {
+	this.nodeBoxInfo.$clear();
+	this.nodeBoxInfo.$(function(ctx, values) {
+		ctx.fillStyle = "rgba(255, 255, 0, 1.0)";
+		ctx.fillRect(-(values[0].width/2), -(values[0].height/2), values[0].width, values[0].height);
+	}, [this.boxInfo]);
+	this.nodeBoxInfo.position($V2([this.boxInfo.x, this.boxInfo.y]));
+	this.nodeBoxInfo.rotation(this.boxInfo.rot);
+	$('#DIVID_C2DEditNode_sliderLog').val('{width:'+this.boxInfo.width+',height:'+this.boxInfo.height+',x:'+this.boxInfo.x+',y:'+this.boxInfo.y+',rot:'+this.boxInfo.rot+'}');
 };
 /**
 * Stop all anims of the scene
