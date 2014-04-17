@@ -401,7 +401,10 @@ Canvas2DNode.prototype.position = function(position) {
 		
 		this.updateM9();
 		
-		if(this.body != undefined) this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+		if(this.body != undefined) {
+			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+			this.makePos = true;
+		}
 	} else {
 		return $V2([this.currentPosition.e[0], this.currentPosition.e[1]]);
 	}

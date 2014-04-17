@@ -55,6 +55,14 @@ Canvas2DJS = function() {
 Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.target = jsonIn.target;
 	this.canvas = this.target.getContext("2d");
+	
+	var e = document.createElement('div');
+	e.id = "C2D_"+this.target.id;
+	this.target.parentNode.insertBefore(e,this.target);
+	this.target.parentNode.removeChild(this.target);
+	e.appendChild(this.target);  
+	this.$ = $('#'+this.target.id);
+		
 	this.width = $('#'+this.target.id).width();
 	this.height = $('#'+this.target.id).height();
 	
@@ -332,6 +340,11 @@ Canvas2DJS.prototype.next = function() {
 		for(var n = 0; n < c2d.nodes.length; n++) {
 			if(c2d.nodes[n].body != undefined) {
 				if(c2d.nodes[n].playStackRunning == false) {
+					if(c2d.nodes[n].makePos != undefined && c2d.nodes[n].makePos) {
+						c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),
+																c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)	));
+						c2d.nodes[n].makePos = false; 
+					}
 					var pos = c2d.nodes[n].body.GetPosition();
 					if(c2d.nodes[n].lockXaxis == false) {
 						var x = pos.x/(c2d.worldScale*c2d.styleWidthScale);
