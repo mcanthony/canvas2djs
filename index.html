@@ -36,17 +36,18 @@
 		</div>
 		
 		<script>		
-			c2d.createScene({target: document.getElementById('animGround'),
+			var c2djs = new Canvas2DJS();
+			c2djs.createScene({target: document.getElementById('animGround'),
 							pxByMeter: 25,
 							screenAdjust: true});
-			c2d.setGravity({x: 0.0, y: 0.0}); // 98.0
+			c2djs.setGravity({x: 0.0, y: 0.0}); // 98.0
 
 			
 									
-			var box = c2d.createNode();
+			var box = c2djs.createNode();
 			box.show();
 			
-			/*var box_sprite1 = c2d.createSprite({	url: 'box.png',
+			/*var box_sprite1 = c2djs.createSprite({	url: 'box.png',
 													cols: 1,
 													rows: 1,
 													onload: function(){
@@ -65,7 +66,7 @@
 			box.animPosition({	position: $V2([150,100]),
 								velocity: 0.1,
 								onend: function() {
-									box.$clear();
+									box.$clear();   
 									box.$(function(ctx) {
 										ctx.fillStyle = "rgba(0, 128, 255, 0.5)";
 										ctx.fillRect(-50, -50, 100, 100);
@@ -87,10 +88,10 @@
 					   
 					   
 					   
-			var ground = c2d.createNode();
+			var ground = c2djs.createNode();
 			ground.show();
 			
-			var ground_sprite1 = c2d.createSprite({	url: 'box.png',
+			var ground_sprite1 = c2djs.createSprite({	url: 'box.png',
 													cols: 1,
 													rows: 1,
 													onload: function(){
@@ -112,8 +113,8 @@
 									
 			
 			// START 
-			c2d.start(function(){
-				c2d.allShow(500);
+			c2djs.start(function(){
+				c2djs.allShow(500);
 			});
 		</script>
 		

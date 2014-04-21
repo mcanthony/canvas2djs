@@ -2,8 +2,9 @@
 * @class
 * @constructor
 */
-Canvas2DNode = function() {
+Canvas2DNode = function(c2d) {
 	this.id = undefined;
+	this.c2d = c2d;
 	this.childsNodes = [];
 	this.M9 = 	[1.0, 0.0, 0.0,
 				0.0, 1.0, 0.0,
@@ -96,10 +97,7 @@ Canvas2DNode.prototype.hide = function(ms, onend) {
 	} 
 	
 	if(ms != undefined) {
-		var _this = this;
-		this.intervalOpacity = window.requestAnimFrame(function(){
-			_this.hideAnimReq(ms);
-		});
+		this.intervalOpacity = window.requestAnimFrame(this.hideAnimReq.bind(this, ms));
 		
 		if(onend != undefined) this.opacityEndFunction = onend;
 	} else {
@@ -118,10 +116,7 @@ Canvas2DNode.prototype.hideAnimReq = function(ms) {
 		if(this.opacityEndFunction != undefined) this.opacityEndFunction();
 		this.opacityEndFunction = undefined;
 	} else {
-		var _this = this;
-		window.requestAnimFrame(function(){
-			_this.hideAnimReq(ms);
-		});
+		window.requestAnimFrame(this.hideAnimReq.bind(this, ms));
 	}
 };
 /**
@@ -136,10 +131,7 @@ Canvas2DNode.prototype.show = function(ms, onend) {
 	} 
 	
 	if(ms != undefined) {
-		var _this = this;
-		this.intervalOpacity = window.requestAnimFrame(function(){
-			_this.showAnimReq(ms);
-		});
+		this.intervalOpacity = window.requestAnimFrame(this.showAnimReq.bind(this, ms));
 		
 		if(onend != undefined) this.opacityEndFunction = onend;
 	} else {
@@ -158,10 +150,7 @@ Canvas2DNode.prototype.showAnimReq = function(ms) {
 		if(this.opacityEndFunction != undefined) this.opacityEndFunction(); 
 		this.opacityEndFunction = undefined;
 	} else {
-		var _this = this;
-		window.requestAnimFrame(function(){
-			_this.showAnimReq(ms);
-		});
+		window.requestAnimFrame(this.showAnimReq.bind(this, ms));
 	}
 };
 // ►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►►
@@ -283,7 +272,6 @@ Canvas2DNode.prototype.animStop = function() {
 Canvas2DNode.prototype.playStack = function(loop) {	
 	if(this.stackPositions.length > 0) {
 		this.playStackRunning = true;
-		var _this = this;
 		var _velocity = this.stackPositions[0][0].velocity;
 		this.anim_onendFunction = this.stackPositions[0][0].onend;
 		
@@ -293,27 +281,21 @@ Canvas2DNode.prototype.playStack = function(loop) {
 				this.intervalRotation = false;
 			}
 			this.setedRotation = this.stackPositions[0][0].rotation;
-			this.intervalRotation = window.requestAnimFrame(function(){
-				_this.rotationAnimReq(_velocity, loop);
-			});
+			this.intervalRotation = window.requestAnimFrame(this.rotationAnimReq.bind(this, _velocity, loop));
 		} else if(this.stackPositions[0][1] == 'scale') { // scale
 			if(this.intervalScale == false) {
 				window.cancelAnimationFrame(this.intervalScale);
 				this.intervalScale = false;
 			}
 			this.setedScale = this.stackPositions[0][0].scale;
-			this.intervalScale = window.requestAnimFrame(function(){
-				_this.scaleAnimReq(_velocity, loop);
-			});
+			this.intervalScale = window.requestAnimFrame(this.scaleAnimReq.bind(this, _velocity, loop));
 		} else { // position
 			if(this.intervalPosition == false) {
 				window.cancelAnimationFrame(this.intervalPosition);
 				this.intervalPosition = false;
 			}
 			this.setedPosition = this.stackPositions[0][0].position;
-			this.intervalPosition = window.requestAnimFrame(function(){
-				_this.positionAnimReq(_velocity, loop);
-			});
+			this.intervalPosition = window.requestAnimFrame(this.positionAnimReq.bind(this, _velocity, loop));
 		}
 		  
 		if(loop != undefined && loop == true) this.stackPositions.push(this.stackPositions[0]);
@@ -337,10 +319,7 @@ Canvas2DNode.prototype.positionAnimReq = function(_velocity, loop) {
 		
 		this.updateM9();
 		
-		var _this = this;
-		window.requestAnimFrame(function(){
-			_this.positionAnimReq(_velocity, loop);
-		});
+		window.requestAnimFrame(this.positionAnimReq.bind(this, _velocity, loop));
 	}
 };
 /** @private */
@@ -358,10 +337,7 @@ Canvas2DNode.prototype.rotationAnimReq = function(_velocity, loop) {
 		
 		this.updateM9();
 		
-		var _this = this;
-		window.requestAnimFrame(function(){
-			_this.rotationAnimReq(_velocity, loop);
-		});
+		window.requestAnimFrame(this.rotationAnimReq.bind(this, _velocity, loop));
 	}
 };
 /** @private */
@@ -379,10 +355,7 @@ Canvas2DNode.prototype.scaleAnimReq = function(_velocity, loop) {
 		
 		this.updateM9();
 		
-		var _this = this;
-		window.requestAnimFrame(function(){
-			_this.scaleAnimReq(_velocity, loop);
-		});
+		window.requestAnimFrame(this.scaleAnimReq.bind(this, _velocity, loop));  
 	}
 };
 /**
@@ -402,7 +375,7 @@ Canvas2DNode.prototype.position = function(position) {
 		this.updateM9();
 		
 		if(this.body != undefined) {
-			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(this.c2d.worldScale*this.c2d.styleWidthScale), this.setedPosition.e[1]*(this.c2d.worldScale*this.c2d.styleHeightScale)));
 			this.makePos = true;
 		}
 	} else {
@@ -502,23 +475,23 @@ Canvas2DNode.prototype.getVectorY = function() {
 * 	@param {Bool} [jsonIn.detector=false] Allow drag the node with the mouse
 */
 Canvas2DNode.prototype.bodyEnable = function(jsonIn) { 
-	if(c2d.world == undefined) c2d.startPhysic();
+	if(this.c2d.world == undefined) this.c2d.startPhysic();
 	
 	this.mousepicking = jsonIn.mousepicking || false;
 	this.detector = jsonIn.detector || false;
 	
 	this.fixDef = new b2FixtureDef;
-	this.fixDef.density = (jsonIn != undefined && jsonIn.density != undefined) ? jsonIn.density*c2d.worldScale : 1.0;
-	this.fixDef.friction = (jsonIn != undefined && jsonIn.friction != undefined) ? jsonIn.friction*c2d.worldScale : 0.5;
-	this.fixDef.restitution = (jsonIn != undefined && jsonIn.restitution != undefined) ? jsonIn.restitution*c2d.worldScale : 0.2;
+	this.fixDef.density = (jsonIn != undefined && jsonIn.density != undefined) ? jsonIn.density*this.c2d.worldScale : 1.0;
+	this.fixDef.friction = (jsonIn != undefined && jsonIn.friction != undefined) ? jsonIn.friction*this.c2d.worldScale : 0.5;
+	this.fixDef.restitution = (jsonIn != undefined && jsonIn.restitution != undefined) ? jsonIn.restitution*this.c2d.worldScale : 0.2;
 	
 	var shapeType = (jsonIn != undefined && jsonIn.shape_type == 'circle') ? 'circle' : 'square';
 	if(shapeType == 'circle') {
-		var shapeRadius = (jsonIn != undefined && jsonIn.radius != undefined) ? jsonIn.radius*(c2d.worldScale*c2d.styleWidthScale) : 25.0*(c2d.worldScale*c2d.styleWidthScale);
+		var shapeRadius = (jsonIn != undefined && jsonIn.radius != undefined) ? jsonIn.radius*(this.c2d.worldScale*this.c2d.styleWidthScale) : 25.0*(this.c2d.worldScale*this.c2d.styleWidthScale);
 		this.fixDef.shape = new b2CircleShape(shapeRadius);
 	} else {
-		var shapeWidth = (jsonIn != undefined && jsonIn.width != undefined) ? (jsonIn.width/2.0)*(c2d.worldScale*c2d.styleWidthScale) : (25.0/2.0)*(c2d.worldScale*c2d.styleWidthScale);
-		var shapeHeight = (jsonIn != undefined && jsonIn.height != undefined) ? (jsonIn.height/2.0)*(c2d.worldScale*c2d.styleWidthScale) : (25.0/2.0)*(c2d.worldScale*c2d.styleWidthScale);
+		var shapeWidth = (jsonIn != undefined && jsonIn.width != undefined) ? (jsonIn.width/2.0)*(this.c2d.worldScale*this.c2d.styleWidthScale) : (25.0/2.0)*(this.c2d.worldScale*this.c2d.styleWidthScale);
+		var shapeHeight = (jsonIn != undefined && jsonIn.height != undefined) ? (jsonIn.height/2.0)*(this.c2d.worldScale*this.c2d.styleWidthScale) : (25.0/2.0)*(this.c2d.worldScale*this.c2d.styleWidthScale);
 		this.fixDef.shape = new b2PolygonShape;
 		this.fixDef.shape.SetAsBox(shapeWidth, shapeHeight);
 	}
@@ -531,9 +504,9 @@ Canvas2DNode.prototype.bodyEnable = function(jsonIn) {
 		this.bodyDef.type = b2Body.b2_kynematicBody;
 	else	
 		this.bodyDef.type = (jsonIn.mass == 0) ? b2Body.b2_staticBody : b2Body.b2_dynamicBody;
-	this.bodyDef.position.Set(this.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale));
+	this.bodyDef.position.Set(this.currentPosition.e[0]*(this.c2d.worldScale*this.c2d.styleWidthScale), this.currentPosition.e[1]*(this.c2d.worldScale*this.c2d.styleHeightScale));
 	
-	this.body = c2d.world.CreateBody(this.bodyDef);
+	this.body = this.c2d.world.CreateBody(this.bodyDef);
 	this.body.canvas2DNode = this;
 	//this.body.SetLinearDamping(10.0); 
 	//this.body.SetLinearVelocity(new b2Vec2(1000,1000)); 
@@ -581,7 +554,7 @@ Canvas2DNode.prototype.bodyActive = function(active) {
 		if(this.tmpBody != undefined || this.body != undefined) {
 			this.body = this.tmpBody || this.body;
 			this.tmpBody = undefined; 
-			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), this.setedPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+			this.body.SetPosition(new b2Vec2(this.setedPosition.e[0]*(this.c2d.worldScale*this.c2d.styleWidthScale), this.setedPosition.e[1]*(this.c2d.worldScale*this.c2d.styleHeightScale)));
 			this.body.SetAngle(this.setedRotation);
 			this.body.SetActive(true);
 			this.body.SetAwake(true);
@@ -597,7 +570,7 @@ Canvas2DNode.prototype.bodyActive = function(active) {
 Canvas2DNode.prototype.bodyRemove = function() { 
 	this.mousepicking = false; 
 	
-	c2d.world.DestroyBody(this.body);
+	this.c2d.world.DestroyBody(this.body);
 	this.body = undefined;
 	
 	for(var n = 0, fn = this.childsNodes.length; n < fn; n++)
@@ -678,15 +651,15 @@ Canvas2DNode.prototype.bodyOnEndCollision = function(funct) {
 */
 Canvas2DNode.prototype.bodySetDistanceJoint = function(jsonIn) { 
 	var dj = new b2DistanceJointDef();
-	dj.Initialize(this.body, jsonIn.node.body, new b2Vec2(this.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),this.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)), new b2Vec2(jsonIn.node.currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),jsonIn.node.currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+	dj.Initialize(this.body, jsonIn.node.body, new b2Vec2(this.currentPosition.e[0]*(this.c2d.worldScale*this.c2d.styleWidthScale),this.currentPosition.e[1]*(this.c2d.worldScale*this.c2d.styleHeightScale)), new b2Vec2(jsonIn.node.currentPosition.e[0]*(this.c2d.worldScale*this.c2d.styleWidthScale),jsonIn.node.currentPosition.e[1]*(this.c2d.worldScale*this.c2d.styleHeightScale)));
 	dj.collideConnected = true;
-	this.distanceJoint = c2d.world.CreateJoint(dj);
+	this.distanceJoint = this.c2d.world.CreateJoint(dj);
 };
 /**
 * Remove distance joint
 */
 Canvas2DNode.prototype.bodyRemoveDistanceJoint = function() { 
-	c2d.world.DestroyJoint(this.distanceJoint);
+	this.c2d.world.DestroyJoint(this.distanceJoint);
 	this.distanceJoint = undefined;
 };
 /**
@@ -713,13 +686,13 @@ Canvas2DNode.prototype.bodySetRevoluteJoint = function(jsonIn) {
 	//rj.localAnchorA.Set(1,1);
 	//rj.localAnchorB.Set(0,0);
   
-	this.revoluteJoint = c2d.world.CreateJoint(this.rj);
+	this.revoluteJoint = this.c2d.world.CreateJoint(this.rj);
 };
 /**
 * Remove revolute joint
 */
 Canvas2DNode.prototype.bodyRemoveRevoluteJoint = function() { 
-	c2d.world.DestroyJoint(this.revoluteJoint);
+	this.c2d.world.DestroyJoint(this.revoluteJoint);
 	this.revoluteJoint = undefined;
 };
 
@@ -752,11 +725,10 @@ Canvas2DNode.prototype.spriteFrames = function(jsonIn) {
 		this.intervalLocalAnim = false;
 	}
 	if(this.totalActiveImages > 1) {
-		var _this = this;
 		var _transition = jsonIn.transition;
-		this.intervalLocalAnim = window.requestAnimFrame(function(){
-			_this.nextImage(_transition);
-		});
+		this.intervalLocalAnim = window.requestAnimFrame((function(){
+			this.nextImage(_transition);
+		}).bind(this));
 										
 		this.frames_onendFunction = jsonIn.onend;
 	} else {
@@ -784,10 +756,9 @@ Canvas2DNode.prototype.nextImage = function(transition) {
 	}
 	this.enableImage(this.currentImage, transition);
 	
-	var _this = this;
-	window.requestAnimFrame(function(){
-		_this.nextImage(transition);
-	});
+	window.requestAnimFrame((function(){
+		this.nextImage(transition);
+	}).bind(this));
 };
 /**
 * Stop the frame animation of the sprite

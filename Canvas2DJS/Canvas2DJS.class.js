@@ -101,38 +101,42 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.$.append(str);
 	
 	 
-	$(document).ready(c2d.updateDivPosition);
-	window.addEventListener("resize", c2d.updateDivPosition, false);
-	window.addEventListener("orientationchange", c2d.updateDivPosition, false); 
-	window.addEventListener('touchStart', function(e) {
-												c2d.divPosition = c2d.getElementPosition(c2d.target);
-												e.preventDefault();
-												//var touch = e.touches[0];
-												//alert(touch.pageX + " - " + touch.pageY);
-											}, false);
-	window.addEventListener('touchmove', function(e) {
-												c2d.divPosition = c2d.getElementPosition(c2d.target);
-												e.preventDefault();
-											}, false);
+	$(document).ready(this.updateDivPosition.bind(this));
+	window.addEventListener("resize", this.updateDivPosition.bind(this), false);
+	window.addEventListener("orientationchange", this.updateDivPosition.bind(this), false); 
+	window.addEventListener('touchStart', this.touchStart.bind(this), false);
+	window.addEventListener('touchmove', this.touchmove.bind(this), false);
 											
-	document.body.addEventListener("mouseup", c2d.mouseup, false);
-	document.body.addEventListener("touchend", c2d.mouseup, false);
-	this.target.addEventListener("mousedown", c2d.mousedown, false);
-	this.target.addEventListener("touchstart", c2d.mousedown, false);
-	document.body.addEventListener("mousemove", c2d.mousemove, false); 
-	document.body.addEventListener("touchmove", c2d.mousemove, false); 
+	document.body.addEventListener("mouseup", this.mouseup.bind(this), false);
+	document.body.addEventListener("touchend", this.mouseup.bind(this), false);
+	this.target.addEventListener("mousedown", this.mousedown.bind(this), false);
+	this.target.addEventListener("touchstart", this.mousedown.bind(this), false);
+	document.body.addEventListener("mousemove", this.mousemove.bind(this), false); 
+	document.body.addEventListener("touchmove", this.mousemove.bind(this), false); 
 	
 	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0}
 	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA XYZ
-		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent, console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
+		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent.bind(this), console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
 	}
 	if(window.DeviceOrientationEvent) { // DEVICEORIENTATION FOR DOM gamma beta alpha
-		window.addEventListener("MozOrientation", this.handleOrientationEvent, true);
-		window.addEventListener("deviceorientation", this.handleOrientationEvent, true);
+		window.addEventListener("MozOrientation", this.handleOrientationEvent.bind(this), true);
+		window.addEventListener("deviceorientation", this.handleOrientationEvent.bind(this), true);
 	} 	
 	if(window.DeviceMotionEvent) { // DEVICEMOTION FOR DOM event.accelerationIncludingGravity.x event.accelerationIncludingGravity.y event.accelerationIncludingGravity.z
-		window.addEventListener("devicemotion", this.handleOrientationEvent, true);
+		window.addEventListener("devicemotion", this.handleOrientationEvent.bind(this), true);
 	}
+};
+/** @private */
+Canvas2DJS.prototype.touchStart = function(e) {
+	this.divPosition = this.getElementPosition(this.target);
+	e.preventDefault();
+	//var touch = e.touches[0];
+	//alert(touch.pageX + " - " + touch.pageY);
+};
+/** @private */
+Canvas2DJS.prototype.touchmove = function(e) {
+	this.divPosition = this.getElementPosition(this.target);
+	e.preventDefault();
 };
 /** @private */
 Canvas2DJS.prototype.makeScreenAdjust = function() {
@@ -183,13 +187,13 @@ Canvas2DJS.prototype.handleOrientationEvent = function(event) {
 	var gamma = event.x || event.gamma || event.accelerationIncludingGravity.x*-100.0;// gamma is the left-to-right tilt in degrees, where right is positive
 	var beta = event.y || event.beta || event.accelerationIncludingGravity.y*100.0;// beta is the front-to-back tilt in degrees, where front is positive
 	var alpha = event.z || event.alpha || event.accelerationIncludingGravity.z*100.0;// alpha is the compass direction the device is facing in degrees
-	c2d.orientation.gamma = (gamma/100)*-1.0;
-	c2d.orientation.beta = (beta/100)*-1.0;
-	c2d.orientation.alpha = (alpha/100)*-1.0;
+	this.orientation.gamma = (gamma/100)*-1.0;
+	this.orientation.beta = (beta/100)*-1.0;
+	this.orientation.alpha = (alpha/100)*-1.0;
 	
-	/*console.log('tiltLR GAMMA X: '+c2d.orientation.gamma+'<br />'+
-				'tiltFB BETA Y: '+c2d.orientation.beta+'<br />'+
-				'dir ALPHA Z: '+c2d.orientation.alpha+'<br />');*/
+	/*console.log('tiltLR GAMMA X: '+this.orientation.gamma+'<br />'+
+				'tiltFB BETA Y: '+this.orientation.beta+'<br />'+
+				'dir ALPHA Z: '+this.orientation.alpha+'<br />');*/
 };
 /**
 * Get the device orientation tiltLeftRight (GAMMA X)
@@ -215,8 +219,8 @@ Canvas2DJS.prototype.getDeviceAlpha = function() {
 
 /** @private */
 Canvas2DJS.prototype.updateDivPosition = function() {
-	c2d.divPositionX = c2d.getElementPosition(c2d.target).x;
-	c2d.divPositionY = c2d.getElementPosition(c2d.target).y;
+	this.divPositionX = this.getElementPosition(this.target).x;
+	this.divPositionY = this.getElementPosition(this.target).y;
 };
 /** @private */
 Canvas2DJS.prototype.getElementPosition = function(element) {
@@ -241,10 +245,10 @@ Canvas2DJS.prototype.getElementPosition = function(element) {
 /**  @private */
 Canvas2DJS.prototype.mouseup = function(e) {
 	//e.preventDefault();
-	c2d.mousePosX = undefined;
-	c2d.mousePosY = undefined;
-	c2d._BODYSeleccionado = undefined;
-	c2d.isMouseDown = false;
+	this.mousePosX = undefined;
+	this.mousePosY = undefined;
+	this._BODYSeleccionado = undefined;
+	this.isMouseDown = false;
 };
 /**  @private */
 Canvas2DJS.prototype.mousedown = function(e) {
@@ -253,10 +257,10 @@ Canvas2DJS.prototype.mousedown = function(e) {
 		e = e.targetTouches[0];
 		e.button = 0;
 	}
-	c2d.oldMousePosClickX = c2d.mousePosX;
-	c2d.oldMousePosClickY = c2d.mousePosY; 
+	this.oldMousePosClickX = this.mousePosX;
+	this.oldMousePosClickY = this.mousePosY; 
 	
-	c2d.isMouseDown = true;
+	this.isMouseDown = true;
 };
 /**  @private */
 Canvas2DJS.prototype.mousemove = function(e) {
@@ -266,16 +270,16 @@ Canvas2DJS.prototype.mousemove = function(e) {
 		e.button = 0;
 	} 
 	
-	c2d.mousePosX = (e.clientX - c2d.divPositionX-(((c2d.width/2)-c2d.camera.M9[2]) *c2d.styleWidthScale)) *(c2d.worldScale);  
-	c2d.mousePosY = (e.clientY - c2d.divPositionY-(((c2d.height/2)-c2d.camera.M9[5]) *c2d.styleHeightScale)) *(c2d.worldScale);
+	this.mousePosX = (e.clientX - this.divPositionX-(((this.width/2)-this.camera.M9[2]) *this.styleWidthScale)) *(this.worldScale);  
+	this.mousePosY = (e.clientY - this.divPositionY-(((this.height/2)-this.camera.M9[5]) *this.styleHeightScale)) *(this.worldScale);
 
-	//console.log(c2d.mousePosX+'	'+c2d.mousePosY);
+	//console.log(this.mousePosX+'	'+this.mousePosY);
 };
 /** @private */
-Canvas2DJS.prototype.getBodyCB = function(fixture) {
+Canvas2DJS.prototype.getBodyCB = function(fixture) { 
 	if(fixture.GetBody().GetType() != b2Body.b2_staticBody) {
-	   if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), c2d.mousePVec)) {
-		  c2d.selectedBody = fixture.GetBody();
+	   if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), this.mousePVec)) {
+		  this.selectedBody = fixture.GetBody();
 		  return false;
 	   }
 	}
@@ -284,89 +288,89 @@ Canvas2DJS.prototype.getBodyCB = function(fixture) {
 
  /** @private */
 Canvas2DJS.prototype.getBodyAtMouse = function() {
-	c2d.mousePVec = new b2Vec2(c2d.mousePosX, c2d.mousePosY);
+	this.mousePVec = new b2Vec2(this.mousePosX, this.mousePosY);
 	var aabb = new b2AABB();
-	aabb.lowerBound.Set(c2d.mousePosX - 0.001, c2d.mousePosY - 0.001);
-	aabb.upperBound.Set(c2d.mousePosX + 0.001, c2d.mousePosY + 0.001);
+	aabb.lowerBound.Set(this.mousePosX - 0.001, this.mousePosY - 0.001);
+	aabb.upperBound.Set(this.mousePosX + 0.001, this.mousePosY + 0.001);
 	 
-	c2d.selectedBody = null;
-	c2d.world.QueryAABB(c2d.getBodyCB, aabb); 
-	return c2d.selectedBody;
+	this.selectedBody = null;
+	this.world.QueryAABB(this.getBodyCB.bind(this), aabb); 
+	return this.selectedBody;
 };
  /** @private */
 Canvas2DJS.prototype.next = function() {
-	window.requestAnimFrame(c2d.next);   
+	window.requestAnimFrame(this.next.bind(this));   
 	
-	if(c2d.physicEnable == true) {
-		c2d.Pstep++;
+	if(this.physicEnable == true) {
+		this.Pstep++;
 		
-		if(c2d.isMouseDown && !c2d.mouseJoint) {
-			if(c2d._BODYSeleccionado == undefined) {
-				c2d._BODYSeleccionado = c2d.getBodyAtMouse();  
-			} else if(c2d._BODYSeleccionado != undefined && c2d._BODYSeleccionado.canvas2DNode.mousepicking == true) {
-				//c2d._BODYSeleccionado.SetPosition(new b2Vec2(c2d.mousePosX, c2d.mousePosY)); 
+		if(this.isMouseDown && !this.mouseJoint) {
+			if(this._BODYSeleccionado == undefined) {
+				this._BODYSeleccionado = this.getBodyAtMouse();  
+			} else if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousepicking == true) {
+				//this._BODYSeleccionado.SetPosition(new b2Vec2(this.mousePosX, this.mousePosY)); 
 				
 				var md = new b2MouseJointDef();
-				md.bodyA = c2d.world.GetGroundBody();
-				md.bodyB = c2d._BODYSeleccionado;
-				md.target.Set(c2d.mousePosX, c2d.mousePosY);
+				md.bodyA = this.world.GetGroundBody();
+				md.bodyB = this._BODYSeleccionado;
+				md.target.Set(this.mousePosX, this.mousePosY);
 				md.collideConnected = true;
-				md.maxForce = 300.0 * c2d._BODYSeleccionado.GetMass();
-				c2d.mouseJoint = c2d.world.CreateJoint(md);
+				md.maxForce = 300.0 * this._BODYSeleccionado.GetMass();
+				this.mouseJoint = this.world.CreateJoint(md);
 				
-				c2d._BODYSeleccionado.SetAwake(true);
+				this._BODYSeleccionado.SetAwake(true);
 			} else {
-				c2d._BODYSeleccionado = undefined;
+				this._BODYSeleccionado = undefined;
 			}
 		}
 	
-		if(c2d.mouseJoint) {
-		   if(c2d._BODYSeleccionado == undefined) {
-				c2d.world.DestroyJoint(c2d.mouseJoint);
-				c2d.mouseJoint = null;
+		if(this.mouseJoint) {
+		   if(this._BODYSeleccionado == undefined) {
+				this.world.DestroyJoint(this.mouseJoint);
+				this.mouseJoint = null;
 			} else { 
-				c2d.mouseJoint.SetTarget(new b2Vec2(c2d.mousePosX, c2d.mousePosY));
+				this.mouseJoint.SetTarget(new b2Vec2(this.mousePosX, this.mousePosY));
 			}
 		}
 	 
-		c2d.world.Step(1 / 60, 10, 10); 
-		//c2d.world.DrawDebugData(); 
-		c2d.world.ClearForces();
+		this.world.Step(1 / 60, 10, 10); 
+		//this.world.DrawDebugData(); 
+		this.world.ClearForces();
 		
-		var obj = c2d.world.GetBodyList();
+		var obj = this.world.GetBodyList();
 		
-		for(var n = 0; n < c2d.nodes.length; n++) {
-			if(c2d.nodes[n].body != undefined) {
-				if(c2d.nodes[n].playStackRunning == false) {
-					if(c2d.nodes[n].makePos != undefined && c2d.nodes[n].makePos) {
-						c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale),
-																c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)	));
-						c2d.nodes[n].makePos = false; 
+		for(var n = 0; n < this.nodes.length; n++) {
+			if(this.nodes[n].body != undefined) {
+				if(this.nodes[n].playStackRunning == false) {
+					if(this.nodes[n].makePos != undefined && this.nodes[n].makePos) {
+						this.nodes[n].body.SetPosition(new b2Vec2(this.nodes[n].currentPosition.e[0]*(this.worldScale*this.styleWidthScale),
+																this.nodes[n].currentPosition.e[1]*(this.worldScale*this.styleHeightScale)	));
+						this.nodes[n].makePos = false; 
 					}
-					var pos = c2d.nodes[n].body.GetPosition();
-					if(c2d.nodes[n].lockXaxis == false) {
-						var x = pos.x/(c2d.worldScale*c2d.styleWidthScale);
+					var pos = this.nodes[n].body.GetPosition();
+					if(this.nodes[n].lockXaxis == false) {
+						var x = pos.x/(this.worldScale*this.styleWidthScale);
 					} else {
-						var x = c2d.nodes[n].currentPosition.e[0];
-						c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), pos.y));
+						var x = this.nodes[n].currentPosition.e[0];
+						this.nodes[n].body.SetPosition(new b2Vec2(this.nodes[n].currentPosition.e[0]*(this.worldScale*this.styleWidthScale), pos.y));
 					}
-					if(c2d.nodes[n].lockYaxis == false) {
-						var y = pos.y/(c2d.worldScale*c2d.styleHeightScale);
+					if(this.nodes[n].lockYaxis == false) {
+						var y = pos.y/(this.worldScale*this.styleHeightScale);
 					} else {
-						var y = c2d.nodes[n].currentPosition.e[1];
-						c2d.nodes[n].body.SetPosition(new b2Vec2(pos.x, c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
+						var y = this.nodes[n].currentPosition.e[1];
+						this.nodes[n].body.SetPosition(new b2Vec2(pos.x, this.nodes[n].currentPosition.e[1]*(this.worldScale*this.styleHeightScale)));
 					}
-					c2d.nodes[n].currentPosition = $V2([x, y]);
+					this.nodes[n].currentPosition = $V2([x, y]);
 					
 					
-					var angle = c2d.nodes[n].body.GetAngle();
-					c2d.nodes[n].currentRotation = angle*-1.0;
+					var angle = this.nodes[n].body.GetAngle();
+					this.nodes[n].currentRotation = angle*-1.0;
 					
-					c2d.nodes[n].updateM9();
+					this.nodes[n].updateM9();
 				} else {
-					c2d.nodes[n].body.SetPosition(new b2Vec2(c2d.nodes[n].currentPosition.e[0]*(c2d.worldScale*c2d.styleWidthScale), c2d.nodes[n].currentPosition.e[1]*(c2d.worldScale*c2d.styleHeightScale)));
-					c2d.nodes[n].body.SetAngle(c2d.nodes[n].currentRotation);
-					c2d.nodes[n].bodyClearForces();
+					this.nodes[n].body.SetPosition(new b2Vec2(this.nodes[n].currentPosition.e[0]*(this.worldScale*this.styleWidthScale), this.nodes[n].currentPosition.e[1]*(this.worldScale*this.styleHeightScale)));
+					this.nodes[n].body.SetAngle(this.nodes[n].currentRotation*-1.0);
+					this.nodes[n].bodyClearForces();
 				}
 				
 			}
@@ -377,42 +381,42 @@ Canvas2DJS.prototype.next = function() {
 	//m11 	m21 	dx
 	//m12 	m22 	dy
 	//0 	0 	1
-	//c2d.canvas.setTransform(m11, m12, m21, m22, dx, dy);
-	//c2d.canvas.transform(1, 0, 0, 1, 0, 0);
-	c2d.canvas.clearRect(0, 0, c2d.width, c2d.height);
+	//this.canvas.setTransform(m11, m12, m21, m22, dx, dy);
+	//this.canvas.transform(1, 0, 0, 1, 0, 0);
+	this.canvas.clearRect(0, 0, this.width, this.height);
 	
-	for(var n = 0; n < c2d.nodes.length; n++) {
+	for(var n = 0; n < this.nodes.length; n++) {
 	
-		c2d.canvas.save();
-		c2d.canvas.globalAlpha = c2d.nodes[n].opacity;
+		this.canvas.save();
+		this.canvas.globalAlpha = this.nodes[n].opacity;
 		
-		var m = c2d.camera.M9;
-		c2d.canvas.setTransform(m[0], m[3], m[1], m[4], (c2d.width/2)-m[2], (c2d.height/2)-m[5]);
+		var m = this.camera.M9;
+		this.canvas.setTransform(m[0], m[3], m[1], m[4], (this.width/2)-m[2], (this.height/2)-m[5]);
 		
-		var m = c2d.nodes[n].M9;
-		c2d.canvas.transform(m[0], m[3], m[1], m[4], m[2], m[5]); 
+		var m = this.nodes[n].M9;
+		this.canvas.transform(m[0], m[3], m[1], m[4], m[2], m[5]); 
 		
-		//c2d.canvas.translate(c2d.camera.currentPosition.e[0], c2d.camera.currentPosition.e[1]);
-		//c2d.canvas.rotate(c2d.camera.currentRotation);
-		//c2d.canvas.scale(c2d.camera.currentScale.e[0], c2d.camera.currentScale.e[1]);
+		//this.canvas.translate(this.camera.currentPosition.e[0], this.camera.currentPosition.e[1]);
+		//this.canvas.rotate(this.camera.currentRotation);
+		//this.canvas.scale(this.camera.currentScale.e[0], this.camera.currentScale.e[1]);
 		
-		for(var s = 0; s < c2d.nodes[n].stack$.length; s++) {
-			c2d.nodes[n].stack$[s](c2d.canvas, c2d.nodes[n].values$[s]);
+		for(var s = 0; s < this.nodes[n].stack$.length; s++) {
+			this.nodes[n].stack$[s](this.canvas, this.nodes[n].values$[s]);
 		}
 		
-		if(c2d.nodes[n].sprite) {
+		if(this.nodes[n].sprite) {
 			
-			c2d.canvas.drawImage(	c2d.nodes[n].sprite.image,
-									c2d.nodes[n].spriteOrigin.x-(c2d.nodes[n].sprite.cellWidth/2),
-									c2d.nodes[n].spriteOrigin.y-(c2d.nodes[n].sprite.cellHeight/2),
-									c2d.nodes[n].sprite.cellWidth,
-									c2d.nodes[n].sprite.cellHeight);
+			this.canvas.drawImage(	this.nodes[n].sprite.image,
+									this.nodes[n].spriteOrigin.x-(this.nodes[n].sprite.cellWidth/2),
+									this.nodes[n].spriteOrigin.y-(this.nodes[n].sprite.cellHeight/2),
+									this.nodes[n].sprite.cellWidth,
+									this.nodes[n].sprite.cellHeight);
 			
 		}
 		
-		c2d.canvas.globalAlpha = 1.0;
+		this.canvas.globalAlpha = 1.0;
 		
-		c2d.canvas.restore();
+		this.canvas.restore();
 		
 	}
 	
@@ -431,15 +435,13 @@ Canvas2DJS.prototype.start = function(onready) {
 	$('#preloaderPercent').html(parseInt((spritesloaded/this.sprites.length)*100.0)+'%'); 
 	if(spritesloaded == this.sprites.length) { 
 		$('#DIVID_SHApreloader').css({'display':'none'});
-		c2d.next();
+		this.next();
 		if(onready != undefined) onready(); 
 	} else {
 		this.allHide(); 
 		$('#DIVID_SHApreloader').css({'display':'block'});
 		
-		setTimeout(function() {
-						c2d.start(onready);
-					}, 100);
+		setTimeout(this.start.bind(this, onready), 100);
 	}
 };
 
@@ -455,7 +457,7 @@ Canvas2DJS.prototype.getCamera = function() {
 * @returns {Canvas2DNode} Canvas2DNode object.
 */
 Canvas2DJS.prototype.createNode = function() {
-	var node = new Canvas2DNode();
+	var node = new Canvas2DNode(this);
 	node.id = this.nodes.length;
 	this.nodes.push(node);
 	
@@ -499,44 +501,44 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 	
 	$("#DIVID_C2DEditNode_sliderWidth").slider({max:150.0,
 											min:1,
-											value:c2d.boxInfo.width,
+											value:this.boxInfo.width,
 											step:1,
-											slide:function(event,ui){
-													 c2d.boxInfo.width = ui.value;
-													 c2d.drawBoxInfo();
-												}});
+											slide:(function(event,ui){
+													 this.boxInfo.width = ui.value;
+													 this.drawBoxInfo();
+												}).bind(this)});
 	$("#DIVID_C2DEditNode_sliderHeight").slider({max:150.0,
 											min:1,
-											value:c2d.boxInfo.height,
+											value:this.boxInfo.height,
 											step:1,
-											slide:function(event,ui){
-													 c2d.boxInfo.height = ui.value;
-													 c2d.drawBoxInfo();
-												}});
-	$("#DIVID_C2DEditNode_sliderX").slider({max:c2d.width,
+											slide:(function(event,ui){
+													 this.boxInfo.height = ui.value;
+													 this.drawBoxInfo();
+												}).bind(this)});
+	$("#DIVID_C2DEditNode_sliderX").slider({max:this.width,
 											min:0,
-											value:c2d.boxInfo.x,
+											value:this.boxInfo.x,
 											step:1,
-											slide:function(event,ui){
-													 c2d.boxInfo.x = ui.value;
-													 c2d.drawBoxInfo();
-												}});
-	$("#DIVID_C2DEditNode_sliderY").slider({max:c2d.height,
+											slide:(function(event,ui){
+													 this.boxInfo.x = ui.value;
+													 this.drawBoxInfo();
+												}).bind(this)});
+	$("#DIVID_C2DEditNode_sliderY").slider({max:this.height,
 											min:0,
-											value:c2d.boxInfo.y,
+											value:this.boxInfo.y,
 											step:1,
-											slide:function(event,ui){
-													 c2d.boxInfo.y = ui.value;
-													 c2d.drawBoxInfo();
-												}});
+											slide:(function(event,ui){
+													 this.boxInfo.y = ui.value;
+													 this.drawBoxInfo();
+												}).bind(this)});
 	$("#DIVID_C2DEditNode_sliderRot").slider({max:3.14*2,
 											min:0.0,
-											value:c2d.boxInfo.rot,
+											value:this.boxInfo.rot,
 											step:0.1,
-											slide:function(event,ui){
-													 c2d.boxInfo.rot = ui.value;
-													 c2d.drawBoxInfo();
-												}});
+											slide:(function(event,ui){
+													 this.boxInfo.rot = ui.value;
+													 this.drawBoxInfo();
+												}).bind(this)});
 };
 /** @private */
 Canvas2DJS.prototype.drawBoxInfo = function() {
@@ -657,4 +659,3 @@ Canvas2DJS.prototype.getPhysicsSteps = function() {
 Canvas2DJS.prototype.resetPhysicsSteps = function() {
 	this.Pstep = 0;
 }; 
-var c2d = new Canvas2DJS();
