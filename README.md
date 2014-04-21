@@ -24,6 +24,7 @@
 ```html
 <canvas id="animGround" width="800" height="600"></canvas>
 <script>
+	var c2d = new Canvas2DJS();
 	c2d.createScene({target: document.getElementById('animGround'),
 					screenAdjust: false});
 
@@ -76,6 +77,7 @@ box.$(function(ctx) {
 <h2>Box2DJS physics</h2>
 <p>Canvas2DJS integrates <a href="http://box2d-js.sourceforge.net/">Box2DJS</a> for easy activation of physical:</p>
 ```javascript
+var c2d = new Canvas2DJS();
 c2d.createScene({	target: document.getElementById('animGround'),
 					screenAdjust: false,
 					pxByMeter: 25});
