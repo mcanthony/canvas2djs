@@ -62,7 +62,7 @@ Canvas2DNode = function(c2d) {
 	this.lockYaxis = false;
 };
 /**
-* Set this node on new layer. By default in layer 0
+* Set this node on new layer. By default in layer 0 (Bottom)
 * @param {Int} id New id of layer
 */
 Canvas2DNode.prototype.setLayer = function(id) { 
