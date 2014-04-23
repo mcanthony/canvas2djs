@@ -10,6 +10,7 @@ Canvas2DNode = function(c2d) {
 				0.0, 1.0, 0.0,
 				0.0, 0.0, 1.0];
 	this.name = undefined;
+	this.layer = 0;
 	
 	// STACK INSTRUCTIONS
 	this.stack$ = [];
@@ -59,6 +60,34 @@ Canvas2DNode = function(c2d) {
 	this.revoluteJoint = undefined;
 	this.lockXaxis = false;
 	this.lockYaxis = false;
+};
+/**
+* Set this node on new layer. By default in layer 0
+* @param {Int} id New id of layer
+*/
+Canvas2DNode.prototype.setLayer = function(id) { 
+	for(var n = 0, fn = this.c2d.layers.length; n < fn; n++) {
+		var tempArr = [];
+		var findest = false;
+		for(var nb = 0, fnb = this.c2d.layers[n].length; nb < fnb; nb++) {
+			if(this.c2d.layers[n][nb] == this) {
+				this.layer = id;
+				if(this.c2d.layers[id] == undefined) this.c2d.layers[id] = [];
+				this.c2d.layers[id].push(this.c2d.layers[n][nb]);
+				findest = true;
+			} else
+				tempArr.push(this.c2d.layers[n][nb]);
+		}
+		this.c2d.layers[n] = tempArr;
+		if(findest) break;
+	}
+};
+/**
+* Get the current layer of this node.
+* @returns {Int} layer
+*/
+Canvas2DNode.prototype.getLayer = function() { 
+	return this.layer;
 };
 /**
 * Add child node
@@ -472,7 +501,7 @@ Canvas2DNode.prototype.getVectorY = function() {
 * 	@param {Float} [jsonIn.friction=0.5] Friction
 * 	@param {Float} [jsonIn.restitution=0.2] Restitution
 * 	@param {Bool} [jsonIn.mousepicking=false] Allow drag the node with the mouse
-* 	@param {Bool} [jsonIn.detector=false] Allow drag the node with the mouse
+* 	@param {Bool} [jsonIn.detector=false] Set as only detector
 */
 Canvas2DNode.prototype.bodyEnable = function(jsonIn) { 
 	if(this.c2d.world == undefined) this.c2d.startPhysic();

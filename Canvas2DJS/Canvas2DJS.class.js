@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 Canvas2DJS = function() {
 	this.nodes = [];
+	this.layers = [];
+	this.layers[0] = [];
 	this.sprites = [];
 	 
 	this.target;
@@ -385,41 +387,43 @@ Canvas2DJS.prototype.next = function() {
 	//this.canvas.transform(1, 0, 0, 1, 0, 0);
 	this.canvas.clearRect(0, 0, this.width, this.height);
 	
-	for(var n = 0; n < this.nodes.length; n++) {
-	
-		this.canvas.save();
-		this.canvas.globalAlpha = this.nodes[n].opacity;
-		
-		var m = this.camera.M9;
-		this.canvas.setTransform(m[0], m[3], m[1], m[4], (this.width/2)-m[2], (this.height/2)-m[5]);
-		
-		var m = this.nodes[n].M9;
-		this.canvas.transform(m[0], m[3], m[1], m[4], m[2], m[5]); 
-		
-		//this.canvas.translate(this.camera.currentPosition.e[0], this.camera.currentPosition.e[1]);
-		//this.canvas.rotate(this.camera.currentRotation);
-		//this.canvas.scale(this.camera.currentScale.e[0], this.camera.currentScale.e[1]);
-		
-		for(var s = 0; s < this.nodes[n].stack$.length; s++) {
-			this.nodes[n].stack$[s](this.canvas, this.nodes[n].values$[s]);
-		}
-		
-		if(this.nodes[n].sprite) {
+	for(var n = 0; n < this.layers.length; n++) {
+		for(var nb = 0; nb < this.layers[n].length; nb++) {
+			var node = this.layers[n][nb];
 			
-			this.canvas.drawImage(	this.nodes[n].sprite.image,
-									this.nodes[n].spriteOrigin.x-(this.nodes[n].sprite.cellWidth/2),
-									this.nodes[n].spriteOrigin.y-(this.nodes[n].sprite.cellHeight/2),
-									this.nodes[n].sprite.cellWidth,
-									this.nodes[n].sprite.cellHeight);
+			this.canvas.save();
+			this.canvas.globalAlpha = node.opacity;
+			
+			var m = this.camera.M9;
+			this.canvas.setTransform(m[0], m[3], m[1], m[4], (this.width/2)-m[2], (this.height/2)-m[5]);
+			
+			var m = node.M9;
+			this.canvas.transform(m[0], m[3], m[1], m[4], m[2], m[5]); 
+			
+			//this.canvas.translate(this.camera.currentPosition.e[0], this.camera.currentPosition.e[1]);
+			//this.canvas.rotate(this.camera.currentRotation);
+			//this.canvas.scale(this.camera.currentScale.e[0], this.camera.currentScale.e[1]);
+			
+			for(var s = 0; s < node.stack$.length; s++) {
+				node.stack$[s](this.canvas, node.values$[s]);
+			}
+			
+			if(node.sprite) {
+				
+				this.canvas.drawImage(	node.sprite.image,
+										node.spriteOrigin.x-(node.sprite.cellWidth/2),
+										node.spriteOrigin.y-(node.sprite.cellHeight/2),
+										node.sprite.cellWidth,
+										node.sprite.cellHeight); 
+				
+			}
+			
+			this.canvas.globalAlpha = 1.0;
+			
+			this.canvas.restore();
 			
 		}
-		
-		this.canvas.globalAlpha = 1.0;
-		
-		this.canvas.restore();
-		
 	}
-	
 };
 /**
 * Start
@@ -460,6 +464,7 @@ Canvas2DJS.prototype.createNode = function() {
 	var node = new Canvas2DNode(this);
 	node.id = this.nodes.length;
 	this.nodes.push(node);
+	this.layers[0].push(node); // by default in layer 0
 	
 	return node;
 };
@@ -516,7 +521,7 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 													 this.drawBoxInfo();
 												}).bind(this)});
 	$("#DIVID_C2DEditNode_sliderX").slider({max:this.width,
-											min:0,
+											min:-this.width,
 											value:this.boxInfo.x,
 											step:1,
 											slide:(function(event,ui){
@@ -524,7 +529,7 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 													 this.drawBoxInfo();
 												}).bind(this)});
 	$("#DIVID_C2DEditNode_sliderY").slider({max:this.height,
-											min:0,
+											min:-this.height,
 											value:this.boxInfo.y,
 											step:1,
 											slide:(function(event,ui){
@@ -534,9 +539,9 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 	$("#DIVID_C2DEditNode_sliderRot").slider({max:3.14*2,
 											min:0.0,
 											value:this.boxInfo.rot,
-											step:0.1,
+											step:0.01,
 											slide:(function(event,ui){
-													 this.boxInfo.rot = ui.value;
+													 this.boxInfo.rot = ui.value;   
 													 this.drawBoxInfo();
 												}).bind(this)});
 };
@@ -549,7 +554,7 @@ Canvas2DJS.prototype.drawBoxInfo = function() {
 	}, [this.boxInfo]);
 	this.nodeBoxInfo.position($V2([this.boxInfo.x, this.boxInfo.y]));
 	this.nodeBoxInfo.rotation(this.boxInfo.rot);
-	$('#DIVID_C2DEditNode_sliderLog').val('{width:'+this.boxInfo.width+',height:'+this.boxInfo.height+',x:'+this.boxInfo.x+',y:'+this.boxInfo.y+',rot:'+this.boxInfo.rot+'}');
+	$('#DIVID_C2DEditNode_sliderLog').val('{width:'+this.boxInfo.width+',height:'+this.boxInfo.height+',x:'+this.boxInfo.x+',y:'+this.boxInfo.y+',rot:'+((3.1416)-this.boxInfo.rot)+'}');
 };
 /**
 * Stop all anims of the scene
