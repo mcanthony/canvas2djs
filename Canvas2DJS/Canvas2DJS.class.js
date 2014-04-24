@@ -486,8 +486,10 @@ Canvas2DJS.prototype.createSprite = function(jsonIn) {
 };
 /**
 * Create one helper box info
+* @param	{Object} jsonIn
+* 	@param {Array<Int>} [jsonIn.rgb=[255,255,0]] Values rgb
 */
-Canvas2DJS.prototype.createHelperBoxInfo = function() {
+Canvas2DJS.prototype.createHelperBoxInfo = function(jsonIn) {
 	var str = 	'<div id="DIVID_C2DEditNode">'+
 					'WIDTH<div id="DIVID_C2DEditNode_sliderWidth"></div>'+
 					'HEIGHT<div id="DIVID_C2DEditNode_sliderHeight"></div>'+
@@ -502,7 +504,12 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 	this.nodeBoxInfo = this.createNode();
 	this.nodeBoxInfo.setLayer(100);
 	this.nodeBoxInfo.show();
-	this.boxInfo = {width: 100, 	height: 5, 	x: 0, 	 y: 0,rot: 0.0};
+	this.boxInfo = {width: 100,
+					height: 5,
+					x: 0,
+					y: 0,
+					rot: 0.0,
+					rgb: (jsonIn!=undefined && jsonIn.rgb!=undefined) ? jsonIn.rgb : [255,255,0]};
 	this.drawBoxInfo();
 	
 	$("#DIVID_C2DEditNode_sliderWidth").slider({max:150.0,
@@ -550,7 +557,7 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 Canvas2DJS.prototype.drawBoxInfo = function() {
 	this.nodeBoxInfo.$clear();
 	this.nodeBoxInfo.$(function(ctx, values) {
-		ctx.fillStyle = "rgba(255, 255, 0, 1.0)";
+		ctx.fillStyle = "rgba("+values[0].rgb[0]+", "+values[0].rgb[1]+", "+values[0].rgb[2]+", 1.0)";
 		ctx.fillRect(-(values[0].width/2), -(values[0].height/2), values[0].width, values[0].height);
 	}, [this.boxInfo]);
 	this.nodeBoxInfo.position($V2([this.boxInfo.x, this.boxInfo.y]));

@@ -66,21 +66,22 @@ Canvas2DNode = function(c2d) {
 * @param {Int} id New id of layer
 */
 Canvas2DNode.prototype.setLayer = function(id) { 
-	for(var n = 0, fn = this.c2d.layers.length; n < fn; n++) {
+	this.c2d.layers.forEach((function(value, key) {
 		var tempArr = [];
 		var findest = false;
-		for(var nb = 0, fnb = this.c2d.layers[n].length; nb < fnb; nb++) {
-			if(this.c2d.layers[n][nb] == this && this.layer != id) {
+		for(var nb = 0, fnb = this.c2d.layers[key].length; nb < fnb; nb++) {
+			var node = this.c2d.layers[key][nb];
+			if(node == this && this.layer != id) {
 				this.layer = id;
 				if(this.c2d.layers[id] == undefined) this.c2d.layers[id] = [];
-				this.c2d.layers[id].push(this.c2d.layers[n][nb]);
+				this.c2d.layers[id].push(node);
 				findest = true;
 			} else
-				tempArr.push(this.c2d.layers[n][nb]);
+				tempArr.push(node);
 		}
-		this.c2d.layers[n] = tempArr;
-		if(findest) break;
-	}
+		this.c2d.layers[key] = tempArr;
+		if(findest) return;
+	}).bind(this));
 };
 /**
 * Get the current layer of this node.
