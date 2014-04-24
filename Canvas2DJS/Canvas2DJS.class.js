@@ -364,9 +364,12 @@ Canvas2DJS.prototype.next = function() {
 					}
 					this.nodes[n].currentPosition = $V2([x, y]);
 					
-					
-					var angle = this.nodes[n].body.GetAngle();
-					this.nodes[n].currentRotation = angle*-1.0;
+					if(this.nodes[n].lockRotation == false) {
+						var angle = this.nodes[n].body.GetAngle();
+						this.nodes[n].currentRotation = angle*-1.0;
+					} else {
+						this.nodes[n].body.SetAngle(this.nodes[n].currentRotation*-1.0);
+					}
 					
 					this.nodes[n].updateM9();
 				} else {

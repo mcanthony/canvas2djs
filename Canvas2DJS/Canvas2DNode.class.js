@@ -60,6 +60,7 @@ Canvas2DNode = function(c2d) {
 	this.revoluteJoint = undefined;
 	this.lockXaxis = false;
 	this.lockYaxis = false;
+	this.lockRotation = false;
 };
 /**
 * Set this node on new layer. By default in layer 0 (Bottom)
@@ -567,6 +568,15 @@ Canvas2DNode.prototype.bodyLockY = function(lock) {
 	this.lockYaxis = lock;
 	for(var n = 0, fn = this.childsNodes.length; n < fn; n++)
 		this.childsNodes[n].node.bodyLockY(lock);
+};
+/**
+* Lock or unlock body in rotation
+* @param {Bool} lock
+*/
+Canvas2DNode.prototype.bodyLockRotation = function(lock) { 
+	this.lockRotation = lock;
+	for(var n = 0, fn = this.childsNodes.length; n < fn; n++)
+		this.childsNodes[n].node.bodyLockRotation(lock);
 };
 /**
 * Enable o disable the body of this node
