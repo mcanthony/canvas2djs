@@ -387,9 +387,9 @@ Canvas2DJS.prototype.next = function() {
 	//this.canvas.transform(1, 0, 0, 1, 0, 0);
 	this.canvas.clearRect(0, 0, this.width, this.height);
 	
-	for(var n = 0; n < this.layers.length; n++) {
-		for(var nb = 0; nb < this.layers[n].length; nb++) {
-			var node = this.layers[n][nb];
+	this.layers.forEach((function(value, key) {
+		for(var nb = 0; nb < value.length; nb++) {
+			var node = this.layers[key][nb];
 			
 			this.canvas.save();
 			this.canvas.globalAlpha = node.opacity;
@@ -423,7 +423,7 @@ Canvas2DJS.prototype.next = function() {
 			this.canvas.restore();
 			
 		}
-	}
+	}).bind(this));
 };
 /**
 * Start
@@ -500,6 +500,7 @@ Canvas2DJS.prototype.createHelperBoxInfo = function() {
 	
 	
 	this.nodeBoxInfo = this.createNode();
+	this.nodeBoxInfo.setLayer(100);
 	this.nodeBoxInfo.show();
 	this.boxInfo = {width: 100, 	height: 5, 	x: 0, 	 y: 0,rot: 0.0};
 	this.drawBoxInfo();
