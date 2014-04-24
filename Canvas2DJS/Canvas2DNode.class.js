@@ -70,7 +70,7 @@ Canvas2DNode.prototype.setLayer = function(id) {
 		var tempArr = [];
 		var findest = false;
 		for(var nb = 0, fnb = this.c2d.layers[n].length; nb < fnb; nb++) {
-			if(this.c2d.layers[n][nb] == this) {
+			if(this.c2d.layers[n][nb] == this && this.layer != id) {
 				this.layer = id;
 				if(this.c2d.layers[id] == undefined) this.c2d.layers[id] = [];
 				this.c2d.layers[id].push(this.c2d.layers[n][nb]);
