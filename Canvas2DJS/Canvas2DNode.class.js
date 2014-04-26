@@ -622,7 +622,7 @@ Canvas2DNode.prototype.bodyRemove = function() {
 * Apply body impulse
 * @param	{Object} jsonIn
 * 	@param {V2} jsonIn.dir Direction vector normalized
-* 	@param {Float} jsonIn.km_h Function fired at every frame
+* 	@param {Float} jsonIn.km_h Velocity
 */
 Canvas2DNode.prototype.bodySetImpulse = function(jsonIn) {
 	var vecDir = $V2([jsonIn.dir.e[0], jsonIn.dir.e[1]]);

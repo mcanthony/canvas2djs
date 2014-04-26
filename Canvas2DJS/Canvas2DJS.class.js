@@ -254,17 +254,18 @@ Canvas2DJS.prototype.mouseup = function(e) {
 	this.mousePosY = undefined;
 	this._BODYSeleccionado = undefined;
 	this.picking = false;
+	this.mousedownFunctionFired = false;
 	this.isMouseDown = false;
 };
 /**  @private */
 Canvas2DJS.prototype.mousedown = function(e) {
-	//e.preventDefault(); // si se habilita no funciona sobre un iframe
+	e.preventDefault();
 	if(e.targetTouches != undefined) {
 		e = e.targetTouches[0];
 		e.button = 0;
 	}
-	this.oldMousePosClickX = this.mousePosX;
-	this.oldMousePosClickY = this.mousePosY; 
+	this.mousePosX = (e.clientX - this.divPositionX-(((this.width/2)-this.camera.M9[2]) *this.styleWidthScale)) *(this.worldScale);  
+	this.mousePosY = (e.clientY - this.divPositionY-(((this.height/2)-this.camera.M9[5]) *this.styleHeightScale)) *(this.worldScale);
 	
 	this.isMouseDown = true;
 };
@@ -311,31 +312,35 @@ Canvas2DJS.prototype.next = function() {
 		this.Pstep++;
 		
 		if(this.isMouseDown && !this.mouseJoint) {
-			if(this._BODYSeleccionado == undefined) {
+			if(this._BODYSeleccionado == undefined)
 				this._BODYSeleccionado = this.getBodyAtMouse();  
-				
-				if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousedownFunction != undefined)
-					this._BODYSeleccionado.canvas2DNode.mousedownFunction();
-			}
-			
-			if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousepicking == true) {
-				this.picking = true;
-				//this._BODYSeleccionado.SetPosition(new b2Vec2(this.mousePosX, this.mousePosY)); 
-				
-				var md = new b2MouseJointDef();
-				md.bodyA = this.world.GetGroundBody();
-				md.bodyB = this._BODYSeleccionado;
-				md.target.Set(this.mousePosX, this.mousePosY);
-				md.collideConnected = true;
-				md.maxForce = 300.0 * this._BODYSeleccionado.GetMass();
-				this.mouseJoint = this.world.CreateJoint(md);
-				
-				this._BODYSeleccionado.SetAwake(true);
-			}
 			
 			if(this._BODYSeleccionado != undefined) {
-				if(this._BODYSeleccionado.canvas2DNode.mousedownFunction == undefined && this.picking == false) {
-					this._BODYSeleccionado = undefined;
+			
+				if(this._BODYSeleccionado.canvas2DNode.mousedownFunction != undefined) {
+					this.picking = true;
+					if(this.mousedownFunctionFired == false) {
+						this._BODYSeleccionado.canvas2DNode.mousedownFunction();
+						this.mousedownFunctionFired = true;
+					}
+				}
+				if(this._BODYSeleccionado.canvas2DNode.mousepicking == true) {
+					this.picking = true;
+					//this._BODYSeleccionado.SetPosition(new b2Vec2(this.mousePosX, this.mousePosY)); 
+					
+					var md = new b2MouseJointDef();
+					md.bodyA = this.world.GetGroundBody();
+					md.bodyB = this._BODYSeleccionado;
+					md.target.Set(this.mousePosX, this.mousePosY);
+					md.collideConnected = true;
+					md.maxForce = 300.0 * this._BODYSeleccionado.GetMass();
+					this.mouseJoint = this.world.CreateJoint(md);
+					
+					this._BODYSeleccionado.SetAwake(true);
+				}
+				
+				if(this.picking == false) {  
+					this._BODYSeleccionado = undefined;  
 				}
 			}
 		}
