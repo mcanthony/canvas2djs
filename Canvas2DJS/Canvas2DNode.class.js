@@ -54,6 +54,8 @@ Canvas2DNode = function(c2d) {
 	this.bodyDef = undefined;
 	this.bodyOnCollisionFunction = undefined;
 	this.bodyOnEndCollisionFunction = undefined;
+	this.mousedownFunction = undefined;
+	this.mouseupFunction = undefined;
 	this.mousepicking = false;
 	this.detector = false;
 	this.distanceJoint = undefined;
@@ -683,6 +685,20 @@ Canvas2DNode.prototype.bodyOnCollision = function(funct) {
 */
 Canvas2DNode.prototype.bodyOnEndCollision = function(funct) { 
 	this.body.bodyOnEndCollisionFunction = funct;
+};
+/**
+* Set body onmousedown function
+* @param {Function} [onmousedown=undefined]
+*/
+Canvas2DNode.prototype.bodyOnMouseDown = function(funct) {
+	this.mousedownFunction = funct;
+};
+/**
+* Set body onmouseup function
+* @param {Function} [onmouseup=undefined]
+*/
+Canvas2DNode.prototype.bodyOnMouseUp = function(funct) {
+	this.mouseupFunction = funct;
 };
 /**
 * set distance joint

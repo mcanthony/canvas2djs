@@ -247,9 +247,13 @@ Canvas2DJS.prototype.getElementPosition = function(element) {
 /**  @private */
 Canvas2DJS.prototype.mouseup = function(e) {
 	//e.preventDefault();
+	if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mouseupFunction != undefined)
+		this._BODYSeleccionado.canvas2DNode.mouseupFunction();
+				
 	this.mousePosX = undefined;
 	this.mousePosY = undefined;
 	this._BODYSeleccionado = undefined;
+	this.picking = false;
 	this.isMouseDown = false;
 };
 /**  @private */
@@ -309,7 +313,13 @@ Canvas2DJS.prototype.next = function() {
 		if(this.isMouseDown && !this.mouseJoint) {
 			if(this._BODYSeleccionado == undefined) {
 				this._BODYSeleccionado = this.getBodyAtMouse();  
-			} else if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousepicking == true) {
+				
+				if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousedownFunction != undefined)
+					this._BODYSeleccionado.canvas2DNode.mousedownFunction();
+			}
+			
+			if(this._BODYSeleccionado != undefined && this._BODYSeleccionado.canvas2DNode.mousepicking == true) {
+				this.picking = true;
 				//this._BODYSeleccionado.SetPosition(new b2Vec2(this.mousePosX, this.mousePosY)); 
 				
 				var md = new b2MouseJointDef();
@@ -321,8 +331,12 @@ Canvas2DJS.prototype.next = function() {
 				this.mouseJoint = this.world.CreateJoint(md);
 				
 				this._BODYSeleccionado.SetAwake(true);
-			} else {
-				this._BODYSeleccionado = undefined;
+			}
+			
+			if(this._BODYSeleccionado != undefined) {
+				if(this._BODYSeleccionado.canvas2DNode.mousedownFunction == undefined && this.picking == false) {
+					this._BODYSeleccionado = undefined;
+				}
 			}
 		}
 	
