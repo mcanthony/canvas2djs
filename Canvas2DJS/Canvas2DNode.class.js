@@ -551,7 +551,15 @@ Canvas2DNode.prototype.bodyEnable = function(jsonIn) {
 	this.body.GetMassData(massData);
 	massData.mass = jsonIn.mass;
 	this.body.SetMassData(massData);
+	
 	// TODO para integrar masa ver hilo http://community.stencyl.com/index.php?topic=8718.0
+};
+/**
+* Should this body be treated like a bullet for continuous collision detection?
+* @param {Bool} bullet
+*/
+Canvas2DNode.prototype.bodySetBullet = function(bullet) { 
+	this.body.SetBullet(bullet);
 };
 /**
 * Lock or unlock body in X axis
