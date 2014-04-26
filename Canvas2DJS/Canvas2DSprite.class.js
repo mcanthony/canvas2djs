@@ -19,25 +19,23 @@ Canvas2DSprite.prototype.create = function(jsonIn) {
 	this.imagePositions = [];
 	
 	this.image = new Image();
-	var _image = this.image;
-	var _this = this;
-	this.image.onload = function() {
-		_this.loaded = true;
-		_this.cellWidth = _image.width/_this.spriteCols;
-		_this.cellHeight = _image.height/_this.spriteRows;
-		var currentCol = 1;
-		var currentRow = 1;
-		for(var n = 0, f = _this.spriteCols*_this.spriteRows; n < f; n++) { 
-			_this.imagePositions[n] = {};
-			_this.imagePositions[n].position = {x:(_this.cellWidth*currentCol), y:(_this.cellHeight*currentRow)};
+	this.image.onload = (function() {
+		this.loaded = true;
+		this.cellWidth = this.image.width/this.spriteCols;
+		this.cellHeight = this.image.height/this.spriteRows;
+		var currentCol = 0;
+		var currentRow = 0;
+		for(var n = 0, f = this.spriteCols*this.spriteRows; n < f; n++) { 
+			this.imagePositions[n] = {};
+			this.imagePositions[n].position = {x:(this.cellWidth*currentCol), y:(this.cellHeight*currentRow)};
 			
-			if(currentCol == (_this.spriteCols)) {
+			if(currentCol == (this.spriteCols)) {
 				currentCol = 1;
 				currentRow++;
 			} else currentCol++;
 		}
 	
 		if(jsonIn.onload != undefined) jsonIn.onload();
-	} 
+	}).bind(this);
 	this.image.src = jsonIn.url;
 };
