@@ -510,6 +510,7 @@ Canvas2DJS.prototype.createSprite = function(jsonIn) {
 * Create one helper box info
 * @param	{Object} jsonIn
 * 	@param {Array<Int>} [jsonIn.rgb=[255,255,0]] Values rgb
+* @returns {Canvas2DNode} Canvas2DNode object.
 */
 Canvas2DJS.prototype.createHelperBoxInfo = function(jsonIn) {
 	var str = 	'<div id="DIVID_C2DEditNode">'+
@@ -518,7 +519,8 @@ Canvas2DJS.prototype.createHelperBoxInfo = function(jsonIn) {
 					'X<div id="DIVID_C2DEditNode_sliderX"></div>'+
 					'Y<div id="DIVID_C2DEditNode_sliderY"></div>'+
 					'ROT<div id="DIVID_C2DEditNode_sliderRot"></div>'+
-					'<input type="text" id="DIVID_C2DEditNode_sliderLog" style="width:100%" />'+
+					'<input type="checkbox" id="DIVID_C2DEditNode_visible" checked="true"/>'+
+					'<input type="text" id="DIVID_C2DEditNode_sliderLog" style="width:90%" />'+
 				'</div>';
 	this.$.append(str);
 	
@@ -533,6 +535,11 @@ Canvas2DJS.prototype.createHelperBoxInfo = function(jsonIn) {
 					rot: 0.0,
 					rgb: (jsonIn!=undefined && jsonIn.rgb!=undefined) ? jsonIn.rgb : [255,255,0]};
 	this.drawBoxInfo();
+	
+	document.getElementById('DIVID_C2DEditNode_visible').addEventListener("click", (function(e) {
+												if(this.opacity == 0.0) this.show();
+												else this.hide();
+											}).bind(this.nodeBoxInfo));
 	
 	$("#DIVID_C2DEditNode_sliderWidth").slider({max:150.0,
 											min:1,
@@ -574,6 +581,8 @@ Canvas2DJS.prototype.createHelperBoxInfo = function(jsonIn) {
 													 this.boxInfo.rot = ui.value;   
 													 this.drawBoxInfo();
 												}).bind(this)});
+
+	return this.nodeBoxInfo;
 };
 /** @private */
 Canvas2DJS.prototype.drawBoxInfo = function() {
