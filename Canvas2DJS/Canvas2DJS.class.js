@@ -464,7 +464,7 @@ Canvas2DJS.prototype.start = function(onready) {
 		this.next();
 		if(onready != undefined) onready(); 
 	} else {
-		this.allHide(); 
+		//this.allHide(); 
 		$('#DIVID_SHApreloader').css({'display':'block'});
 		
 		setTimeout(this.start.bind(this, onready), 100);
