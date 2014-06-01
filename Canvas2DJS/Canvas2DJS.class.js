@@ -116,7 +116,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	document.body.addEventListener("mousemove", this.mousemove.bind(this), false); 
 	document.body.addEventListener("touchmove", this.mousemove.bind(this), false); 
 	
-	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0}
+	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0};
 	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA XYZ
 		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent.bind(this), console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
 	}
@@ -304,8 +304,13 @@ Canvas2DJS.prototype.getBodyAtMouse = function() {
 	this.world.QueryAABB(this.getBodyCB.bind(this), aabb); 
 	return this.selectedBody;
 };
+var lastUpdate = Date.now();
  /** @private */
 Canvas2DJS.prototype.next = function() {
+	var now = Date.now();
+    var dt = now - lastUpdate;
+    lastUpdate = now;
+    
 	window.requestAnimFrame(this.next.bind(this));   
 	
 	if(this.physicEnable == true) {
@@ -354,11 +359,11 @@ Canvas2DJS.prototype.next = function() {
 			}
 		}
 	 
-		this.world.Step(1 / 60, 10, 10); 
+		this.world.Step(dt/1000, 10, 10); 
 		//this.world.DrawDebugData(); 
 		this.world.ClearForces();
 		
-		var obj = this.world.GetBodyList();
+		//var obj = this.world.GetBodyList();
 		
 		for(var n = 0; n < this.nodes.length; n++) {
 			if(this.nodes[n].body != undefined) {
@@ -369,16 +374,17 @@ Canvas2DJS.prototype.next = function() {
 						this.nodes[n].makePos = false; 
 					}
 					var pos = this.nodes[n].body.GetPosition();
+					var x, y;
 					if(this.nodes[n].lockXaxis == false) {
-						var x = pos.x/(this.worldScale*this.styleWidthScale);
+						x = pos.x/(this.worldScale*this.styleWidthScale);
 					} else {
-						var x = this.nodes[n].currentPosition.e[0];
+						x = this.nodes[n].currentPosition.e[0];
 						this.nodes[n].body.SetPosition(new b2Vec2(this.nodes[n].currentPosition.e[0]*(this.worldScale*this.styleWidthScale), pos.y));
 					}
 					if(this.nodes[n].lockYaxis == false) {
-						var y = pos.y/(this.worldScale*this.styleHeightScale);
+						y = pos.y/(this.worldScale*this.styleHeightScale);
 					} else {
-						var y = this.nodes[n].currentPosition.e[1];
+						y = this.nodes[n].currentPosition.e[1];
 						this.nodes[n].body.SetPosition(new b2Vec2(pos.x, this.nodes[n].currentPosition.e[1]*(this.worldScale*this.styleHeightScale)));
 					}
 					this.nodes[n].currentPosition = $V2([x, y]);
@@ -644,19 +650,19 @@ Canvas2DJS.prototype.startPhysic = function() {
 		var bodB = contact.GetFixtureB().GetBody();
 		if(bodA.bodyOnCollisionFunction != undefined) bodA.bodyOnCollisionFunction(bodB.canvas2DNode);
 		if(bodB.bodyOnCollisionFunction != undefined) bodB.bodyOnCollisionFunction(bodA.canvas2DNode);
-    }
+    };
     listener.EndContact = function(contact) {
         var bodA = contact.GetFixtureA().GetBody();
 		var bodB = contact.GetFixtureB().GetBody();
 		if(bodA.bodyOnEndCollisionFunction != undefined) bodA.bodyOnEndCollisionFunction(bodB.canvas2DNode);
 		if(bodB.bodyOnEndCollisionFunction != undefined) bodB.bodyOnEndCollisionFunction(bodA.canvas2DNode);
-    }
+    };
     listener.PostSolve = function(contact, impulse) {
         
-    }
+    };
     listener.PreSolve = function(contact, oldManifold) {
 
-    }
+    };
     this.world.SetContactListener(listener);
 	
 	this.physicEnable = true;
