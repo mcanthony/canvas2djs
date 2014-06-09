@@ -63,6 +63,8 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	
 	this.targetP = document.createElement('div');
 	this.targetP.id = "C2D_"+this.target.id;
+	this.targetP.style.width = this.width+"px";
+	this.targetP.style.height = this.height+"px";
 	this.targetP.style.margin = "0px auto 0px auto";
 	this.target.parentNode.insertBefore(this.targetP,this.target);
 	this.target.parentNode.removeChild(this.target);
@@ -71,11 +73,6 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.$.css('overflow','hidden');
 	
 			
-	// SCREEN ADJUST
-	this.styleWidthScale = 1.0;
-	this.styleHeightScale = 1.0;
-	this.screenAdjust = (jsonIn.screenAdjust != undefined && jsonIn.screenAdjust) ? this.makeScreenAdjust() : false;
-	
 	// BOX2DJS
 	this.worldScale = (jsonIn.pxByMeter != undefined) ? (1.0/jsonIn.pxByMeter) : (1.0/6.0);	 
 	this.camera = new Canvas2DNode();
@@ -83,31 +80,27 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	
 	// PRELOADER SCREEN
 	this._preloaderBgColor = jsonIn.preloaderBgColor || "#FF0000";
-	var str = 	'<table id="C2D_preloader" style="z-index:99;width:'+this.width+'px;height:'+this.height+'px;background-color:'+this._preloaderBgColor+'">'+
-					'<tr>'+
-						'<td colspan="3" style="height:'+(this.height/2.9)+'px">'+
-						'</td>'+
-					'</tr>'+
-					'<tr>'+
-						'<td style="width:80px">'+
-						'</td>'+
-						'<td style="width:'+(this.width-160)+'px">'+
+	var str = 	'<div id="C2D_preloader" style="z-index:99;width:'+this.width+'px;height:'+this.height+'px;background-color:'+this._preloaderBgColor+'">'+
+					'<div style="height:'+(this.height/2.9)+'px"></div>'+
+					'<div style="display:table;width:100%;">'+
+						'<div style="display:table-cell;width:10%"></div>'+
+						'<div style="display:table-cell;width:80%">'+
 							'<img src="'+c2djsDirectory+'/logo.png" />'+
 							'<div style="height:10px;background:#CCC;border:1px solid #FFF;">'+
 								'<div id="C2D_preloaderBar" style="height:10px;background:#FF6600;"></div>'+
-							'<div>'+
-						'</td>'+
-						'<td>'+
-						'</td>'+
-					'</tr>'+
-					'<tr>'+
-						'<td colspan="3" >'+
-						'</td>'+
-					'</tr>'+
-				'</table>';
+							'</div>'+
+						'</div>'+
+						'<div style="display:table-cell;width:10%"></div>'+
+					'</div>'+
+				'</div>';
 	this.$.append(str);
 	this._preloader = document.getElementById('C2D_preloader');
 	this._preloaderBar = document.getElementById('C2D_preloaderBar');
+	
+	// SCREEN ADJUST
+	this.styleWidthScale = 1.0;
+	this.styleHeightScale = 1.0;
+	this.screenAdjust = (jsonIn.screenAdjust != undefined && jsonIn.screenAdjust) ? this.makeScreenAdjust() : false;
 	
 	
 	$(document).ready(this.updateDivPosition.bind(this));
@@ -180,19 +173,19 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 	var newCanvasWidth = ((heightScreen/aspectH)*aspectW);
 	var newCanvasHeight = ((widthScreen/aspectW)*aspectH);
 	if(newCanvasHeight <= heightScreen) {
-		this.target.style.width = widthScreen+'px';
-		this.target.style.height = newCanvasHeight+'px';
+		this.targetP.style.width = widthScreen+'px';
+		this.targetP.style.height = newCanvasHeight+'px';
 	} else {
-		this.target.style.width = newCanvasWidth+'px';
-		this.target.style.height = heightScreen+'px';
+		this.targetP.style.width = newCanvasWidth+'px';
+		this.targetP.style.height = heightScreen+'px';
 	}
-	this.targetP.style.width = this.target.style.width;
-	this.targetP.style.height = this.target.style.height;
-	this._preloader.style.width = this.target.style.width;
-	this._preloader.style.height = this.target.style.height;
+	this.target.style.width = this.targetP.style.width;
+	this.target.style.height = this.targetP.style.height; 
+	this._preloader.style.width = this.targetP.style.width;
+	this._preloader.style.height = this.targetP.style.height;
 	
-	this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
-	this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
+	this.styleWidthScale = parseInt(this.targetP.style.width.replace(/px/gi, ''))/this.width;  
+	this.styleHeightScale = parseInt(this.targetP.style.height.replace(/px/gi, ''))/this.height;
 	this.updateDivPosition();
 };
 /** @private */
