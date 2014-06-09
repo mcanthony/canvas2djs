@@ -53,6 +53,7 @@ Canvas2DJS = function() {
 * 	@param {HTMLCanvasElement} jsonIn.target The canvas element
 * 	@param {Float} [jsonIn.screenAdjust=false] Adjust the canvas to the screen maintaining the aspect ratio
 * 	@param {Float} [jsonIn.pxByMeter=6.0] Scale of dynamic world
+* 	@param {String} [jsonIn.preloaderBgColor="#FF0000"] Background color of the preloader screen
 */
 Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.target = jsonIn.target;
@@ -64,7 +65,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.targetP.id = "C2D_"+this.target.id;
 	this.target.parentNode.insertBefore(this.targetP,this.target);
 	this.target.parentNode.removeChild(this.target);
-	this.targetP.appendChild(this.target);  
+	
 	this.$ = $('#'+this.targetP.id);
 	this.$.css('overflow','hidden');
 	
@@ -79,7 +80,9 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	this.camera = new Canvas2DNode();
 	this.camera.show();
 	
-	var str = 	'<table id="DIVID_SHApreloader" style="z-index:99;position:absolute;width:'+this.width+'px;height:'+this.height+'px;background-color:#FF0000">'+
+	// PRELOADER SCREEN
+	this._preloaderBgColor = jsonIn.preloaderBgColor || "#FF0000";
+	var str = 	'<table id="DIVID_SHApreloader" style="z-index:99;position:absolute;width:'+this.width+'px;height:'+this.height+'px;background-color:'+this._preloaderBgColor+'">'+
 					'<tr>'+
 						'<td colspan="3" style="height:'+(this.height/2.9)+'px">'+
 						'</td>'+
@@ -88,6 +91,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 						'<td style="width:80px">'+
 						'</td>'+
 						'<td style="width:'+(this.width-160)+'px">'+
+							'<img src="'+c2djsDirectory+'/logo.png" />'+
 							'<div style="height:10px;background:#CCC;border:1px solid #FFF;">'+
 								'<div id="DIVID_SHApreloaderBar" style="height:10px;background:#FF6600;"></div>'+
 							'<div>'+
@@ -101,8 +105,12 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 					'</tr>'+
 				'</table>';
 	this.$.append(str);
-	
+	this.targetP.appendChild(this.target);
+	this.targetP.style.width = this.width+"px";
+	this.targetP.style.height = this.height+"px";
+	this.targetP.style.margin = "0px auto 0px auto";
 	 
+	
 	$(document).ready(this.updateDivPosition.bind(this));
 	window.addEventListener("resize", this.updateDivPosition.bind(this), false);
 	window.addEventListener("orientationchange", this.updateDivPosition.bind(this), false); 
@@ -116,7 +124,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	document.body.addEventListener("mousemove", this.mousemove.bind(this), false); 
 	document.body.addEventListener("touchmove", this.mousemove.bind(this), false); 
 	
-	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0}
+	this.orientation = {alpha:0.0, beta:0.0, gamma:0.0};
 	if(navigator.accelerometer) { // DEVICEORIENTATION FOR APACHE CORDOVA XYZ
 		navigator.accelerometer.watchAcceleration(this.handleOrientationEvent.bind(this), console.log('NO ACCELEROMETER FOR CORDOVA'), {frequency: 3000});	
 	}
@@ -175,9 +183,13 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 	if(newCanvasHeight <= heightScreen) {
 		this.target.style.width = widthScreen+'px';
 		this.target.style.height = newCanvasHeight+'px';
+		this.width = widthScreen;
+		this.height = newCanvasHeight;
 	} else {
 		this.target.style.width = newCanvasWidth+'px';
 		this.target.style.height = heightScreen+'px';
+		this.width = newCanvasWidth;
+		this.height = heightScreen;
 	}
 
 	this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
@@ -304,8 +316,13 @@ Canvas2DJS.prototype.getBodyAtMouse = function() {
 	this.world.QueryAABB(this.getBodyCB.bind(this), aabb); 
 	return this.selectedBody;
 };
+var lastUpdate = Date.now();
  /** @private */
 Canvas2DJS.prototype.next = function() {
+	var now = Date.now();
+    var dt = now - lastUpdate;
+    lastUpdate = now;
+    
 	window.requestAnimFrame(this.next.bind(this));   
 	
 	if(this.physicEnable == true) {
@@ -354,11 +371,11 @@ Canvas2DJS.prototype.next = function() {
 			}
 		}
 	 
-		this.world.Step(1 / 60, 10, 10); 
+		this.world.Step(dt/1000, 10, 10); 
 		//this.world.DrawDebugData(); 
 		this.world.ClearForces();
 		
-		var obj = this.world.GetBodyList();
+		//var obj = this.world.GetBodyList();
 		
 		for(var n = 0; n < this.nodes.length; n++) {
 			if(this.nodes[n].body != undefined) {
@@ -369,16 +386,17 @@ Canvas2DJS.prototype.next = function() {
 						this.nodes[n].makePos = false; 
 					}
 					var pos = this.nodes[n].body.GetPosition();
+					var x, y;
 					if(this.nodes[n].lockXaxis == false) {
-						var x = pos.x/(this.worldScale*this.styleWidthScale);
+						x = pos.x/(this.worldScale*this.styleWidthScale);
 					} else {
-						var x = this.nodes[n].currentPosition.e[0];
+						x = this.nodes[n].currentPosition.e[0];
 						this.nodes[n].body.SetPosition(new b2Vec2(this.nodes[n].currentPosition.e[0]*(this.worldScale*this.styleWidthScale), pos.y));
 					}
 					if(this.nodes[n].lockYaxis == false) {
-						var y = pos.y/(this.worldScale*this.styleHeightScale);
+						y = pos.y/(this.worldScale*this.styleHeightScale);
 					} else {
-						var y = this.nodes[n].currentPosition.e[1];
+						y = this.nodes[n].currentPosition.e[1];
 						this.nodes[n].body.SetPosition(new b2Vec2(pos.x, this.nodes[n].currentPosition.e[1]*(this.worldScale*this.styleHeightScale)));
 					}
 					this.nodes[n].currentPosition = $V2([x, y]);
@@ -455,10 +473,10 @@ Canvas2DJS.prototype.start = function(onready) {
 	var spritesloaded = 0;
 	for(var n = 0, fn = this.sprites.length; n < fn; n++)
 		if(this.sprites[n].loaded == true) spritesloaded++;
-		//$('#DIVID_SHApreloaderBar').css({'width':50.0+'%'}); 
+		$('#DIVID_SHApreloaderBar').css({'width':50.0+'%'}); 
 
 	$('#DIVID_SHApreloaderBar').css({'width':(spritesloaded/this.sprites.length)*100.0+'%'}); 
-	$('#preloaderPercent').html(parseInt((spritesloaded/this.sprites.length)*100.0)+'%'); 
+	//$('#preloaderPercent').html(parseInt((spritesloaded/this.sprites.length)*100.0)+'%'); 
 	if(spritesloaded == this.sprites.length) { 
 		$('#DIVID_SHApreloader').css({'display':'none'});
 		this.next();
@@ -644,19 +662,19 @@ Canvas2DJS.prototype.startPhysic = function() {
 		var bodB = contact.GetFixtureB().GetBody();
 		if(bodA.bodyOnCollisionFunction != undefined) bodA.bodyOnCollisionFunction(bodB.canvas2DNode);
 		if(bodB.bodyOnCollisionFunction != undefined) bodB.bodyOnCollisionFunction(bodA.canvas2DNode);
-    }
+    };
     listener.EndContact = function(contact) {
         var bodA = contact.GetFixtureA().GetBody();
 		var bodB = contact.GetFixtureB().GetBody();
 		if(bodA.bodyOnEndCollisionFunction != undefined) bodA.bodyOnEndCollisionFunction(bodB.canvas2DNode);
 		if(bodB.bodyOnEndCollisionFunction != undefined) bodB.bodyOnEndCollisionFunction(bodA.canvas2DNode);
-    }
+    };
     listener.PostSolve = function(contact, impulse) {
         
-    }
+    };
     listener.PreSolve = function(contact, oldManifold) {
 
-    }
+    };
     this.world.SetContactListener(listener);
 	
 	this.physicEnable = true;
