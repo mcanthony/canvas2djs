@@ -63,9 +63,10 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	
 	this.targetP = document.createElement('div');
 	this.targetP.id = "C2D_"+this.target.id;
+	this.targetP.style.margin = "0px auto 0px auto";
 	this.target.parentNode.insertBefore(this.targetP,this.target);
 	this.target.parentNode.removeChild(this.target);
-	
+	this.targetP.appendChild(this.target);
 	this.$ = $('#'+this.targetP.id);
 	this.$.css('overflow','hidden');
 	
@@ -82,7 +83,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 	
 	// PRELOADER SCREEN
 	this._preloaderBgColor = jsonIn.preloaderBgColor || "#FF0000";
-	var str = 	'<table id="DIVID_SHApreloader" style="z-index:99;position:absolute;width:'+this.width+'px;height:'+this.height+'px;background-color:'+this._preloaderBgColor+'">'+
+	var str = 	'<table id="C2D_preloader" style="z-index:99;width:'+this.width+'px;height:'+this.height+'px;background-color:'+this._preloaderBgColor+'">'+
 					'<tr>'+
 						'<td colspan="3" style="height:'+(this.height/2.9)+'px">'+
 						'</td>'+
@@ -93,7 +94,7 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 						'<td style="width:'+(this.width-160)+'px">'+
 							'<img src="'+c2djsDirectory+'/logo.png" />'+
 							'<div style="height:10px;background:#CCC;border:1px solid #FFF;">'+
-								'<div id="DIVID_SHApreloaderBar" style="height:10px;background:#FF6600;"></div>'+
+								'<div id="C2D_preloaderBar" style="height:10px;background:#FF6600;"></div>'+
 							'<div>'+
 						'</td>'+
 						'<td>'+
@@ -105,11 +106,9 @@ Canvas2DJS.prototype.createScene = function(jsonIn) {
 					'</tr>'+
 				'</table>';
 	this.$.append(str);
-	this.targetP.appendChild(this.target);
-	this.targetP.style.width = this.width+"px";
-	this.targetP.style.height = this.height+"px";
-	this.targetP.style.margin = "0px auto 0px auto";
-	 
+	this._preloader = document.getElementById('C2D_preloader');
+	this._preloaderBar = document.getElementById('C2D_preloaderBar');
+	
 	
 	$(document).ready(this.updateDivPosition.bind(this));
 	window.addEventListener("resize", this.updateDivPosition.bind(this), false);
@@ -183,15 +182,15 @@ Canvas2DJS.prototype.makeScreenAdjust = function() {
 	if(newCanvasHeight <= heightScreen) {
 		this.target.style.width = widthScreen+'px';
 		this.target.style.height = newCanvasHeight+'px';
-		this.width = widthScreen;
-		this.height = newCanvasHeight;
 	} else {
 		this.target.style.width = newCanvasWidth+'px';
 		this.target.style.height = heightScreen+'px';
-		this.width = newCanvasWidth;
-		this.height = heightScreen;
 	}
-
+	this.targetP.style.width = this.target.style.width;
+	this.targetP.style.height = this.target.style.height;
+	this._preloader.style.width = this.target.style.width;
+	this._preloader.style.height = this.target.style.height;
+	
 	this.styleWidthScale = parseInt(this.target.style.width.replace(/px/gi, ''))/this.width;  
 	this.styleHeightScale = parseInt(this.target.style.height.replace(/px/gi, ''))/this.height;
 	this.updateDivPosition();
@@ -473,17 +472,20 @@ Canvas2DJS.prototype.start = function(onready) {
 	var spritesloaded = 0;
 	for(var n = 0, fn = this.sprites.length; n < fn; n++)
 		if(this.sprites[n].loaded == true) spritesloaded++;
-		$('#DIVID_SHApreloaderBar').css({'width':50.0+'%'}); 
-
-	$('#DIVID_SHApreloaderBar').css({'width':(spritesloaded/this.sprites.length)*100.0+'%'}); 
+	
+	this._preloaderBar.style.width = '50%'; 
+	this._preloaderBar.style.width = (spritesloaded/this.sprites.length)*100.0+'%'; 
 	//$('#preloaderPercent').html(parseInt((spritesloaded/this.sprites.length)*100.0)+'%'); 
+	
 	if(spritesloaded == this.sprites.length) { 
-		$('#DIVID_SHApreloader').css({'display':'none'});
+		this.target.style.display = "block";
+		this._preloader.style.display = "none";
 		this.next();
 		if(onready != undefined) onready(); 
 	} else {
 		//this.allHide(); 
-		$('#DIVID_SHApreloader').css({'display':'block'});
+		this.target.style.display = "none";
+		this._preloader.style.display = "block";
 		
 		setTimeout(this.start.bind(this, onready), 100);
 	}
